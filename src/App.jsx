@@ -415,19 +415,31 @@ export default function RuckChallenge() {
     return null;
   }, [logs]);
 
-  // Personal bests: longest single ruck, heaviest carry, current weekly streak
+  // Personal bests: longest single ruck, heaviest carry, rolling 7-day streak.
+  // Any 7 consecutive logged days = 1 week; 14 = 2; etc. A missed day resets the current run.
   const bests = useMemo(() => {
     const entries = Object.entries(logs);
     const longestRuck = entries.reduce((m, [, v]) => Math.max(m, parseFloat(v.miles) || 0), 0);
     const heaviestCarry = entries.reduce((m, [, v]) => Math.max(m, parseFloat(v.weight) || 0), 0);
 
-    const weekSet = new Set(entries.map(([dateKey]) => mondayKey(dateKey)));
-    let streak = 0;
-    let cursor = currentChallengeWeekKey();
-    while (cursor && weekSet.has(cursor)) {
-      streak++;
-      cursor = addDays(cursor, -7);
+    const loggedDates = entries
+      .filter(([, v]) => (parseFloat(v.miles) || 0) > 0)
+      .map(([dateKey]) => dateKey)
+      .sort();
+
+    let consecutiveDays = 0;
+    if (loggedDates.length) {
+      consecutiveDays = 1;
+      for (let i = loggedDates.length - 1; i > 0; i--) {
+        const a = new Date(loggedDates[i - 1] + "T00:00:00");
+        const b = new Date(loggedDates[i] + "T00:00:00");
+        const gap = Math.round((b - a) / 86400000);
+        if (gap === 1) consecutiveDays++;
+        else break;
+      }
     }
+
+    const streak = Math.floor(consecutiveDays / 7);
     return { longestRuck, heaviestCarry, streak };
   }, [logs]);
 
@@ -584,7 +596,10 @@ export default function RuckChallenge() {
   }
 
   return (
-    <div style={{ background: LIME, minHeight: "100vh", fontFamily: "'Barlow', system-ui, sans-serif" }}>
+    <div
+      className="app-shell"
+      style={{ background: LIME, minHeight: "100vh", fontFamily: "'Barlow', system-ui, sans-serif" }}
+    >
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Anton&family=Barlow:wght@400;500;600;700;800&family=Caveat:wght@600;700&display=swap');
         .chalk { font-family: 'Caveat', cursive; }
@@ -831,7 +846,10 @@ export default function RuckChallenge() {
 
       {/* FULL-SCREEN CALENDAR — opened by tapping the van window */}
       {calendarOpen && (
-        <div className="fixed inset-0 z-40 flex flex-col" style={{ background: LIME }}>
+        <div
+          className="fixed inset-0 z-40 flex flex-col w-screen max-w-full overflow-x-hidden"
+          style={{ background: LIME, width: "100vw", maxWidth: "100vw", touchAction: "pan-y" }}
+        >
           <div style={{ background: INK }} className="px-5 py-4 flex items-center justify-between flex-shrink-0">
             <div>
               <p className="display" style={{ color: LIME, fontSize: "1.3rem" }}>Your {YEAR} Log</p>
@@ -847,14 +865,14 @@ export default function RuckChallenge() {
             </button>
           </div>
 
-          <div className="flex-1 overflow-y-auto px-5 py-5">
-            <div className="max-w-3xl mx-auto grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="flex-1 overflow-y-auto overflow-x-hidden px-4 sm:px-5 py-5 w-full max-w-full">
+            <div className="max-w-3xl w-full min-w-0 mx-auto grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {MONTH_NAMES.map((monthName, m) => {
                 const blanks = leadingBlanks(m);
                 const total = daysInMonth(m);
                 const cells = [...Array(blanks).fill(null), ...Array(total).fill(0).map((_, i) => i + 1)];
                 return (
-                  <div key={m} style={{ background: "white", borderRadius: 10, border: `2px solid ${INK}` }} className="p-4 shadow-sm">
+                  <div key={m} style={{ background: "white", borderRadius: 10, border: `2px solid ${INK}` }} className="p-4 shadow-sm min-w-0 w-full max-w-full overflow-hidden">
                     <h3 className="font-bold mb-3" style={{ color: INK }}>{monthName}</h3>
                     <div className="grid grid-cols-7 gap-1 mb-1">
                       {["M","T","W","T","F","S","S"].map((d, i) => (
@@ -1122,15 +1140,23 @@ export default function RuckChallenge() {
       {/* DAY MODAL */}
       {activeDate && (
         <div
-          className="fixed inset-0 flex items-end sm:items-center justify-center p-0 sm:p-6 z-50"
-          style={{ background: "rgba(13,13,13,0.6)" }}
+          className="fixed inset-0 flex items-end sm:items-center justify-center p-0 sm:p-6 z-50 w-screen max-w-full overflow-x-hidden"
+          style={{ background: "rgba(13,13,13,0.6)", width: "100vw", maxWidth: "100vw", touchAction: "pan-y" }}
           onClick={() => setActiveDate(null)}
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            style={{ background: "white", borderRadius: 14 }}
-            className="w-full sm:max-w-sm p-6 relative"
+            style={{
+              background: "white",
+              borderRadius: 14,
+              width: "100%",
+              maxWidth: "min(100vw, 24rem)",
+              maxHeight: "calc(100dvh - 4.75rem)",
+              paddingBottom: "max(1rem, env(safe-area-inset-bottom))",
+            }}
+            className="relative overflow-y-auto overflow-x-hidden overscroll-contain"
           >
+            <div className="p-5 sm:p-6 pb-3 min-w-0">
             <button onClick={() => setActiveDate(null)} className="absolute top-4 right-4 text-stone-400 hover:text-stone-700">
               <X size={20} />
             </button>
@@ -1159,7 +1185,7 @@ export default function RuckChallenge() {
                   value={form.miles}
                   onChange={(e) => setForm({ ...form, miles: e.target.value })}
                   placeholder="0.0"
-                  className="mt-1 w-full border rounded-md px-3 py-2 font-normal"
+                  className="mt-1 w-full min-w-0 max-w-full border rounded-md px-3 py-2 font-normal text-base"
                   style={{ borderColor: "#ddd" }}
                 />
               </label>
@@ -1170,7 +1196,7 @@ export default function RuckChallenge() {
                   value={form.weight}
                   onChange={(e) => setForm({ ...form, weight: e.target.value })}
                   placeholder="0"
-                  className="mt-1 w-full border rounded-md px-3 py-2 font-normal"
+                  className="mt-1 w-full min-w-0 max-w-full border rounded-md px-3 py-2 font-normal text-base"
                   style={{ borderColor: "#ddd" }}
                 />
               </label>
@@ -1179,11 +1205,11 @@ export default function RuckChallenge() {
                 <p className="text-xs font-bold uppercase tracking-wide mb-2" style={{ color: LIME_DARK }}>
                   Rucking calculator — {name.trim() || "Anonymous rucker"}
                 </p>
-                <div className="flex justify-between text-sm">
+                <div className="flex justify-between gap-3 text-sm min-w-0">
                   <span className="flex items-center gap-1 text-stone-600"><Flame size={14} /> Est. calories</span>
                   <span className="font-bold" style={{ color: INK }}>{liveCalories.toLocaleString()}</span>
                 </div>
-                <div className="flex justify-between text-sm mt-1">
+                <div className="flex justify-between gap-3 text-sm mt-1 min-w-0">
                   <span className="flex items-center gap-1 text-stone-600"><Footprints size={14} /> Est. steps</span>
                   <span className="font-bold" style={{ color: INK }}>{liveSteps.toLocaleString()}</span>
                 </div>
@@ -1191,10 +1217,19 @@ export default function RuckChallenge() {
               </div>
             </div>
 
-            <div className="flex gap-2 mt-5">
+            </div>
+            <div
+              className="sticky bottom-0 left-0 right-0 flex gap-2 px-5 sm:px-6 pt-3 border-t"
+              style={{
+                background: "white",
+                paddingBottom: "max(1rem, env(safe-area-inset-bottom))",
+                borderColor: "#eee",
+                zIndex: 2,
+              }}
+            >
               <button
                 onClick={saveDay}
-                style={{ background: INK, color: LIME }}
+                style={{ background: INK, color: LIME, minHeight: 48 }}
                 className="flex-1 py-3 rounded-md font-semibold"
               >
                 {saving ? "Saving…" : "Save ruck"}

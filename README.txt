@@ -1,3 +1,14 @@
+RUCK 500 — VERSION 1.4 TEST BUILD
+
+Test fixes:
+- Week streak now means any rolling 7 consecutive logged days = 1 week, 14 = 2, etc.
+- Strong mobile width containment on the home screen, calendar and log modal.
+- iPhone Safari input-focus zoom prevented by 16px input sizing.
+- Log modal now fits the visible viewport and scrolls internally.
+- Save/Delete actions are sticky and have iPhone safe-area spacing.
+- January 2027 remains temporarily unlocked for testing.
+- No branding, image, event, certificate or concept changes.
+
 RUCK 500 — VERSION 1.3 TEST BUILD
 
 Test-only correction:
