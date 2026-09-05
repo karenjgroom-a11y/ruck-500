@@ -60,6 +60,15 @@ const MENU = [
 // Simple generic camper-van silhouette — kept as a spare asset, no longer used directly
 // (the real photo is used instead), but left here in case it's wanted again.
 function VanShape({ size = 160, fill = LIME, outline = INK }) {
+  function closeMilestone() {
+    if (milestoneQueue.length) {
+      setMilestoneHit(milestoneQueue[0]);
+      setMilestoneQueue((queue) => queue.slice(1));
+    } else {
+      setMilestoneHit(null);
+    }
+  }
+
   return (
     <svg width={size} height={size * 0.62} viewBox="0 0 200 124" fill="none" xmlns="http://www.w3.org/2000/svg">
       <rect x="6" y="34" width="188" height="62" rx="18" fill={fill} stroke={outline} strokeWidth="4" />
@@ -349,6 +358,7 @@ export default function RuckChallenge() {
   const [syncStatus, setSyncStatus] = useState("idle"); // idle | syncing | synced | error
   const [joke, setJoke] = useState("");
   const [milestoneHit, setMilestoneHit] = useState(null);
+  const [milestoneQueue, setMilestoneQueue] = useState([]);
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [certificateOpen, setCertificateOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -422,24 +432,38 @@ export default function RuckChallenge() {
     const longestRuck = entries.reduce((m, [, v]) => Math.max(m, parseFloat(v.miles) || 0), 0);
     const heaviestCarry = entries.reduce((m, [, v]) => Math.max(m, parseFloat(v.weight) || 0), 0);
 
-    const loggedDates = entries
-      .filter(([, v]) => (parseFloat(v.miles) || 0) > 0)
-      .map(([dateKey]) => dateKey)
-      .sort();
+    // Count every completed 7-day run across the challenge year.
+    // Separate runs still accumulate: 7 days + gap + 7 days = 2 week streaks.
+    const loggedDates = [...new Set(
+      entries
+        .filter(([, v]) => (parseFloat(v.miles) || 0) > 0)
+        .map(([dateKey]) => dateKey)
+    )].sort();
 
-    let consecutiveDays = 0;
-    if (loggedDates.length) {
-      consecutiveDays = 1;
-      for (let i = loggedDates.length - 1; i > 0; i--) {
-        const a = new Date(loggedDates[i - 1] + "T00:00:00");
-        const b = new Date(loggedDates[i] + "T00:00:00");
-        const gap = Math.round((b - a) / 86400000);
-        if (gap === 1) consecutiveDays++;
-        else break;
+    let streak = 0;
+    let runLength = 0;
+    let previousDate = null;
+
+    for (const dateKey of loggedDates) {
+      const currentDate = new Date(dateKey + "T00:00:00");
+
+      if (!previousDate) {
+        runLength = 1;
+      } else {
+        const gap = Math.round((currentDate - previousDate) / 86400000);
+        if (gap === 1) {
+          runLength += 1;
+        } else {
+          streak += Math.floor(runLength / 7);
+          runLength = 1;
+        }
       }
+
+      previousDate = currentDate;
     }
 
-    const streak = Math.floor(consecutiveDays / 7);
+    if (runLength) streak += Math.floor(runLength / 7);
+
     return { longestRuck, heaviestCarry, streak };
   }, [logs]);
 
@@ -516,17 +540,20 @@ export default function RuckChallenge() {
     const existingMiles = parseFloat(logs[k]?.miles) || 0;
     const prevTotal = totals.miles;
     const newTotal = prevTotal - existingMiles + miles;
-    const hit = MILESTONES.find((m) => prevTotal < m && newTotal >= m);
+    const crossed = MILESTONES.filter((m) => prevTotal < m && newTotal >= m);
 
-    // Show the result in the UI right away — nothing typed is ever lost, even if sync is slow
+    // Show the result in the UI right away — nothing typed is ever lost, even if storage is slow.
     setLogs(next);
     setActiveDate(null);
     setSaving(false);
-    if (hit) setMilestoneHit(hit);
+    if (crossed.length) {
+      setMilestoneHit(crossed[0]);
+      setMilestoneQueue(crossed.slice(1));
+    }
 
     const ok = persistLogs(next);
     setSyncStatus(ok ? "synced" : "error");
-    if (!hit) {
+    if (!crossed.length) {
       const who = name.trim() ? `Well done, ${name.trim()} — ruck logged! 🎒` : "Well done — ruck logged! 🎒";
       setToast(ok ? who : "Ruck is shown here, but this browser could not save it. Please use Backup after checking storage permissions.");
       setTimeout(() => setToast(""), 3200);
@@ -617,10 +644,59 @@ export default function RuckChallenge() {
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         .hide-scrollbar { scrollbar-width: none; -ms-overflow-style: none; }
         @media print {
-          body * { visibility: hidden; }
-          .certificate-print, .certificate-print * { visibility: visible; }
-          .certificate-print { position: fixed; inset: 0; margin: auto; }
-          .no-print { display: none !important; }
+          @page {
+            size: A4 portrait;
+            margin: 12mm;
+          }
+
+          html, body, #root, .app-shell {
+            width: 100% !important;
+            height: auto !important;
+            min-height: 0 !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            overflow: visible !important;
+            background: white !important;
+          }
+
+          .app-shell > *:not(.certificate-print-overlay) {
+            display: none !important;
+          }
+
+          .certificate-print-overlay {
+            display: block !important;
+            position: static !important;
+            width: 100% !important;
+            height: auto !important;
+            min-height: 0 !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            background: white !important;
+            overflow: visible !important;
+          }
+
+          .certificate-print {
+            position: static !important;
+            display: block !important;
+            width: 100% !important;
+            max-width: 180mm !important;
+            margin: 0 auto !important;
+            border-radius: 0 !important;
+            overflow: visible !important;
+            break-inside: avoid-page !important;
+            page-break-inside: avoid !important;
+            box-shadow: none !important;
+          }
+
+          .certificate-print,
+          .certificate-print * {
+            break-inside: avoid-page !important;
+            page-break-inside: avoid !important;
+          }
+
+          .no-print {
+            display: none !important;
+          }
         }
       `}</style>
 
@@ -1261,14 +1337,14 @@ export default function RuckChallenge() {
         <div
           className="fixed inset-0 flex items-center justify-center p-6 z-50"
           style={{ background: "rgba(13,13,13,0.75)" }}
-          onClick={() => setMilestoneHit(null)}
+          onClick={closeMilestone}
         >
           <div
             onClick={(e) => e.stopPropagation()}
             style={{ background: LIME, borderRadius: 16, border: `3px solid ${INK}` }}
             className="w-full sm:max-w-sm p-8 text-center relative"
           >
-            <button onClick={() => setMilestoneHit(null)} className="absolute top-4 right-4" style={{ color: INK }}>
+            <button onClick={closeMilestone} className="absolute top-4 right-4" style={{ color: INK }}>
               <X size={20} />
             </button>
             <Trophy size={48} color={INK} className="mx-auto mb-3" />
@@ -1282,7 +1358,7 @@ export default function RuckChallenge() {
             </p>
             <div className="flex gap-2 mt-6">
               <button
-                onClick={() => setMilestoneHit(null)}
+                onClick={closeMilestone}
                 style={{ background: INK, color: LIME }}
                 className="flex-1 px-6 py-2 rounded-full font-semibold"
               >
@@ -1305,7 +1381,7 @@ export default function RuckChallenge() {
       {/* PRINTABLE COMPLETION CERTIFICATE */}
       {certificateOpen && completionInfo && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          className="certificate-print-overlay fixed inset-0 z-50 flex items-center justify-center p-4"
           style={{ background: "rgba(13,13,13,0.85)" }}
           onClick={() => setCertificateOpen(false)}
         >

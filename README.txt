@@ -1,3 +1,23 @@
+RUCK 500 — VERSION 1.5 TEST BUILD
+
+Three targeted fixes only:
+1. If one saved ruck crosses several milestones, every crossed milestone is
+   celebrated in order (50, 100, 250, 500 as applicable).
+2. Week streak is cumulative across the year: every completed block of seven
+   consecutive logged days counts as one, even when separate seven-day runs
+   are divided by gaps.
+3. Certificate print mode outputs the certificate only and is constrained to
+   one A4 portrait page without spare app pages.
+
+Everything else from V1.4 is intentionally retained, including:
+- January 2027 temporary test unlock
+- mobile width containment
+- iPhone input-focus sizing
+- internally scrollable log modal
+- sticky Save/Delete controls and safe-area spacing
+- Backup/Restore
+- existing visuals, images, events, branding and certificate design
+
 RUCK 500 — VERSION 1.4 TEST BUILD
 
 Test fixes:
