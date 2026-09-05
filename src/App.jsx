@@ -310,7 +310,10 @@ function addDays(dateKey, days) {
   d.setDate(d.getDate() + days);
   return d.toISOString().slice(0, 10);
 }
+const TEST_UNLOCK_DATE = "2027-01-01"; // TEMPORARY: remove before final public release
 function isFutureChallengeDate(m, d) {
+  const dateKey = keyFor(m, d);
+  if (dateKey === TEST_UNLOCK_DATE) return false;
   const target = new Date(YEAR, m, d, 23, 59, 59, 999);
   return target > new Date();
 }
@@ -609,36 +612,42 @@ export default function RuckChallenge() {
 
       {/* NAME BAR */}
       <div style={{ background: INK }} className="px-6 py-3">
-        <div className="max-w-3xl mx-auto flex items-center gap-3">
-          <label htmlFor="rucker-name" style={{ color: LIME }} className="text-xs font-bold uppercase tracking-wide whitespace-nowrap">
-            Rucker's name
-          </label>
-          <input
-            id="rucker-name"
-            type="text"
-            value={name}
-            onChange={(e) => saveName(e.target.value)}
-            onBlur={(e) => persistName(e.target.value)}
-            placeholder="Enter your name"
-            style={{ background: CHARCOAL, color: "white", border: `1px solid ${LIME_DARK}`, borderRadius: 6 }}
-            className="flex-1 px-3 py-1.5 text-sm outline-none"
-          />
-          <button
-            onClick={downloadBackup}
-            style={{ color: LIME, border: `1px solid ${LIME_DARK}`, borderRadius: 6 }}
-            className="px-2 py-1.5 text-xs font-semibold whitespace-nowrap"
-            title="Download a backup of your name and 2027 ruck log"
-          >
-            Backup
-          </button>
-          <button
-            onClick={() => restoreInputRef.current?.click()}
-            style={{ color: LIME, border: `1px solid ${LIME_DARK}`, borderRadius: 6 }}
-            className="px-2 py-1.5 text-xs font-semibold whitespace-nowrap"
-            title="Restore a Ruck 500 backup file"
-          >
-            Restore
-          </button>
+        <div className="max-w-3xl mx-auto">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-2 flex-1 min-w-0">
+              <label htmlFor="rucker-name" style={{ color: LIME }} className="text-xs font-bold uppercase tracking-wide whitespace-nowrap">
+                Rucker's name
+              </label>
+              <input
+                id="rucker-name"
+                type="text"
+                value={name}
+                onChange={(e) => saveName(e.target.value)}
+                onBlur={(e) => persistName(e.target.value)}
+                placeholder="Enter your name"
+                style={{ background: CHARCOAL, color: "white", border: `1px solid ${LIME_DARK}`, borderRadius: 6 }}
+                className="w-full sm:flex-1 min-w-0 px-3 py-1.5 text-sm outline-none"
+              />
+            </div>
+            <div className="flex gap-2">
+              <button
+                onClick={downloadBackup}
+                style={{ color: LIME, border: `1px solid ${LIME_DARK}`, borderRadius: 6 }}
+                className="flex-1 sm:flex-none px-3 py-1.5 text-xs font-semibold whitespace-nowrap"
+                title="Download a backup of your name and 2027 ruck log"
+              >
+                Backup
+              </button>
+              <button
+                onClick={() => restoreInputRef.current?.click()}
+                style={{ color: LIME, border: `1px solid ${LIME_DARK}`, borderRadius: 6 }}
+                className="flex-1 sm:flex-none px-3 py-1.5 text-xs font-semibold whitespace-nowrap"
+                title="Restore a Ruck 500 backup file"
+              >
+                Restore
+              </button>
+            </div>
+          </div>
           <input
             ref={restoreInputRef}
             type="file"
@@ -647,7 +656,7 @@ export default function RuckChallenge() {
             onChange={(e) => restoreBackup(e.target.files?.[0])}
           />
           {syncStatus === "error" && (
-            <span className="text-xs whitespace-nowrap" style={{ color: "#FF8A65" }}>Storage unavailable</span>
+            <span className="block mt-2 text-xs" style={{ color: "#FF8A65" }}>Storage unavailable</span>
           )}
         </div>
       </div>

@@ -1,3 +1,10 @@
+RUCK 500 — VERSION 1.1 TEST BUILD
+
+Temporary testing update:
+- Responsive mobile Backup/Restore layout.
+- 1 January 2027 temporarily unlocked for testing only.
+- Remove test unlock before final public release.
+
 RUCK 500 — VERSION 1.0 CONTROLLED FINAL
 
 Purpose
