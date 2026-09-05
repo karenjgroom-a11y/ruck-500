@@ -60,15 +60,6 @@ const MENU = [
 // Simple generic camper-van silhouette — kept as a spare asset, no longer used directly
 // (the real photo is used instead), but left here in case it's wanted again.
 function VanShape({ size = 160, fill = LIME, outline = INK }) {
-  function closeMilestone() {
-    if (milestoneQueue.length) {
-      setMilestoneHit(milestoneQueue[0]);
-      setMilestoneQueue((queue) => queue.slice(1));
-    } else {
-      setMilestoneHit(null);
-    }
-  }
-
   return (
     <svg width={size} height={size * 0.62} viewBox="0 0 200 124" fill="none" xmlns="http://www.w3.org/2000/svg">
       <rect x="6" y="34" width="188" height="62" rx="18" fill={fill} stroke={outline} strokeWidth="4" />
@@ -357,8 +348,7 @@ export default function RuckChallenge() {
   const [name, setName] = useState("");
   const [syncStatus, setSyncStatus] = useState("idle"); // idle | syncing | synced | error
   const [joke, setJoke] = useState("");
-  const [milestoneHit, setMilestoneHit] = useState(null);
-  const [milestoneQueue, setMilestoneQueue] = useState([]);
+  const [achievementQueue, setAchievementQueue] = useState([]);
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [certificateOpen, setCertificateOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -425,15 +415,12 @@ export default function RuckChallenge() {
     return null;
   }, [logs]);
 
-  // Personal bests: longest single ruck, heaviest carry, rolling 7-day streak.
-  // Any 7 consecutive logged days = 1 week; 14 = 2; etc. A missed day resets the current run.
+  // Personal bests: longest single ruck, heaviest carry, and cumulative 7-day streak blocks.
   const bests = useMemo(() => {
     const entries = Object.entries(logs);
     const longestRuck = entries.reduce((m, [, v]) => Math.max(m, parseFloat(v.miles) || 0), 0);
     const heaviestCarry = entries.reduce((m, [, v]) => Math.max(m, parseFloat(v.weight) || 0), 0);
 
-    // Count every completed 7-day run across the challenge year.
-    // Separate runs still accumulate: 7 days + gap + 7 days = 2 week streaks.
     const loggedDates = [...new Set(
       entries
         .filter(([, v]) => (parseFloat(v.miles) || 0) > 0)
@@ -446,7 +433,6 @@ export default function RuckChallenge() {
 
     for (const dateKey of loggedDates) {
       const currentDate = new Date(dateKey + "T00:00:00");
-
       if (!previousDate) {
         runLength = 1;
       } else {
@@ -458,7 +444,6 @@ export default function RuckChallenge() {
           runLength = 1;
         }
       }
-
       previousDate = currentDate;
     }
 
@@ -536,24 +521,65 @@ export default function RuckChallenge() {
     };
     const next = { ...logs, [k]: entry };
 
-    // Check whether this save crosses a milestone threshold
+    // Work out every achievement created by this save.
     const existingMiles = parseFloat(logs[k]?.miles) || 0;
     const prevTotal = totals.miles;
     const newTotal = prevTotal - existingMiles + miles;
-    const crossed = MILESTONES.filter((m) => prevTotal < m && newTotal >= m);
+    const crossedMilestones = MILESTONES.filter((m) => prevTotal < m && newTotal >= m);
+
+    // Recalculate cumulative 7-day streak blocks before and after this save.
+    const calculateStreakBlocks = (sourceLogs) => {
+      const loggedDates = [...new Set(
+        Object.entries(sourceLogs)
+          .filter(([, v]) => (parseFloat(v.miles) || 0) > 0)
+          .map(([dateKey]) => dateKey)
+      )].sort();
+
+      let blocks = 0;
+      let runLength = 0;
+      let previousDate = null;
+
+      for (const dateKey of loggedDates) {
+        const currentDate = new Date(dateKey + "T00:00:00");
+        if (!previousDate) {
+          runLength = 1;
+        } else {
+          const gap = Math.round((currentDate - previousDate) / 86400000);
+          if (gap === 1) runLength += 1;
+          else {
+            blocks += Math.floor(runLength / 7);
+            runLength = 1;
+          }
+        }
+        previousDate = currentDate;
+      }
+
+      if (runLength) blocks += Math.floor(runLength / 7);
+      return blocks;
+    };
+
+    const previousStreakBlocks = calculateStreakBlocks(logs);
+    const newStreakBlocks = calculateStreakBlocks(next);
+
+    const achievements = [
+      ...crossedMilestones.map((m) => ({ type: "milestone", value: m })),
+      ...Array.from(
+        { length: Math.max(0, newStreakBlocks - previousStreakBlocks) },
+        (_, i) => ({ type: "streak", value: previousStreakBlocks + i + 1 })
+      ),
+    ];
 
     // Show the result in the UI right away — nothing typed is ever lost, even if storage is slow.
     setLogs(next);
     setActiveDate(null);
     setSaving(false);
-    if (crossed.length) {
-      setMilestoneHit(crossed[0]);
-      setMilestoneQueue(crossed.slice(1));
+    if (achievements.length) {
+      setAchievementQueue((queue) => [...queue, ...achievements]);
     }
 
     const ok = persistLogs(next);
     setSyncStatus(ok ? "synced" : "error");
-    if (!crossed.length) {
+    if (!achievements.length) {
       const who = name.trim() ? `Well done, ${name.trim()} — ruck logged! 🎒` : "Well done — ruck logged! 🎒";
       setToast(ok ? who : "Ruck is shown here, but this browser could not save it. Please use Backup after checking storage permissions.");
       setTimeout(() => setToast(""), 3200);
@@ -650,12 +676,12 @@ export default function RuckChallenge() {
           }
 
           html, body, #root, .app-shell {
-            width: 100% !important;
-            height: auto !important;
-            min-height: 0 !important;
             margin: 0 !important;
             padding: 0 !important;
-            overflow: visible !important;
+            width: 100% !important;
+            height: 100% !important;
+            min-height: 0 !important;
+            overflow: hidden !important;
             background: white !important;
           }
 
@@ -664,28 +690,29 @@ export default function RuckChallenge() {
           }
 
           .certificate-print-overlay {
-            display: block !important;
-            position: static !important;
+            display: flex !important;
+            position: fixed !important;
+            inset: 0 !important;
             width: 100% !important;
-            height: auto !important;
-            min-height: 0 !important;
+            height: 100% !important;
+            align-items: center !important;
+            justify-content: center !important;
             padding: 0 !important;
             margin: 0 !important;
             background: white !important;
-            overflow: visible !important;
+            overflow: hidden !important;
           }
 
           .certificate-print {
-            position: static !important;
             display: block !important;
+            position: static !important;
             width: 100% !important;
             max-width: 180mm !important;
             margin: 0 auto !important;
             border-radius: 0 !important;
-            overflow: visible !important;
+            box-shadow: none !important;
             break-inside: avoid-page !important;
             page-break-inside: avoid !important;
-            box-shadow: none !important;
           }
 
           .certificate-print,
@@ -1332,48 +1359,62 @@ export default function RuckChallenge() {
         </div>
       )}
 
-      {/* MILESTONE CELEBRATION */}
-      {milestoneHit && (
+      {/* ACHIEVEMENT CELEBRATION QUEUE */}
+      {achievementQueue.length > 0 && (
         <div
           className="fixed inset-0 flex items-center justify-center p-6 z-50"
           style={{ background: "rgba(13,13,13,0.75)" }}
-          onClick={closeMilestone}
+          onClick={() => setAchievementQueue((queue) => queue.slice(1))}
         >
           <div
             onClick={(e) => e.stopPropagation()}
             style={{ background: LIME, borderRadius: 16, border: `3px solid ${INK}` }}
             className="w-full sm:max-w-sm p-8 text-center relative"
           >
-            <button onClick={closeMilestone} className="absolute top-4 right-4" style={{ color: INK }}>
+            <button
+              onClick={() => setAchievementQueue((queue) => queue.slice(1))}
+              className="absolute top-4 right-4"
+              style={{ color: INK }}
+              aria-label="Close achievement"
+            >
               <X size={20} />
             </button>
-            <Trophy size={48} color={INK} className="mx-auto mb-3" />
-            <p className="display" style={{ color: INK, fontSize: "1rem" }}>MILESTONE UNLOCKED</p>
-            <h3 className="display mt-1" style={{ color: INK, fontSize: "2rem", lineHeight: 1.05 }}>
-              {milestoneHit} Miles
-            </h3>
-            <p style={{ color: INK }} className="font-semibold mt-2">{MILESTONE_LABELS[milestoneHit]}</p>
-            <p style={{ color: INK }} className="text-sm opacity-70 mt-1">
-              Nice one, {name.trim() || "Anonymous rucker"} 🎉
-            </p>
-            <div className="flex gap-2 mt-6">
-              <button
-                onClick={closeMilestone}
-                style={{ background: INK, color: LIME }}
-                className="flex-1 px-6 py-2 rounded-full font-semibold"
-              >
-                Keep Rucking
-              </button>
-              {milestoneHit === GOAL_MILES && (
-                <button
-                  onClick={() => { setMilestoneHit(null); setCertificateOpen(true); }}
-                  style={{ background: "transparent", color: INK, border: `2px solid ${INK}` }}
-                  className="flex-1 px-4 py-2 rounded-full font-semibold text-sm"
-                >
-                  Certificate
-                </button>
-              )}
-            </div>
+
+            {achievementQueue[0].type === "milestone" ? (
+              <>
+                <Trophy size={48} color={INK} className="mx-auto mb-3" />
+                <p className="display" style={{ color: INK, fontSize: "1rem" }}>MILESTONE UNLOCKED</p>
+                <h3 className="display mt-1" style={{ color: INK, fontSize: "2rem", lineHeight: 1.05 }}>
+                  {achievementQueue[0].value} Miles
+                </h3>
+                <p style={{ color: INK }} className="font-semibold mt-2">
+                  {MILESTONE_LABELS[achievementQueue[0].value]}
+                </p>
+                <p style={{ color: INK }} className="text-sm opacity-70 mt-1">
+                  Keep rucking — every mile counts.
+                </p>
+              </>
+            ) : (
+              <>
+                <Repeat size={48} color={INK} className="mx-auto mb-3" />
+                <p className="display" style={{ color: INK, fontSize: "1rem" }}>7-DAY STREAK UNLOCKED</p>
+                <h3 className="display mt-1" style={{ color: INK, fontSize: "2rem", lineHeight: 1.05 }}>
+                  Week {achievementQueue[0].value}
+                </h3>
+                <p style={{ color: INK }} className="font-semibold mt-2">
+                  Seven consecutive rucking days completed.
+                </p>
+                <p style={{ color: INK }} className="text-sm opacity-70 mt-1">
+                  Your total week streak is now {achievementQueue[0].value}.
+                </p>
+              </>
+            )}
+
+            {achievementQueue.length > 1 && (
+              <p style={{ color: INK }} className="text-xs opacity-60 mt-4">
+                {achievementQueue.length - 1} more achievement{achievementQueue.length - 1 === 1 ? "" : "s"} waiting
+              </p>
+            )}
           </div>
         </div>
       )}

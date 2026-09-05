@@ -1,22 +1,24 @@
-RUCK 500 — VERSION 1.5 TEST BUILD
+RUCK 500 — VERSION 1.6 TEST BUILD
 
-Three targeted fixes only:
-1. If one saved ruck crosses several milestones, every crossed milestone is
-   celebrated in order (50, 100, 250, 500 as applicable).
-2. Week streak is cumulative across the year: every completed block of seven
-   consecutive logged days counts as one, even when separate seven-day runs
-   are divided by gaps.
-3. Certificate print mode outputs the certificate only and is constrained to
-   one A4 portrait page without spare app pages.
+Built from the stable V1.4 mobile foundation.
 
-Everything else from V1.4 is intentionally retained, including:
+Targeted V1.6 fixes:
+1. One central achievement queue handles both mileage milestones and 7-day streak awards.
+   If one save crosses multiple mileage thresholds, every crossed milestone is shown in order.
+2. Week streak is cumulative across the year:
+   every completed 7 consecutive logged days counts as one streak block,
+   including separate runs divided by gaps.
+3. A pop-up is shown whenever saving a ruck creates a new 7-day streak block.
+4. Certificate print mode remains one page and is centred on A4.
+
+Preserved from V1.4:
 - January 2027 temporary test unlock
 - mobile width containment
 - iPhone input-focus sizing
 - internally scrollable log modal
 - sticky Save/Delete controls and safe-area spacing
 - Backup/Restore
-- existing visuals, images, events, branding and certificate design
+- existing visuals, embedded images, Buzz events, branding and certificate design
 
 RUCK 500 — VERSION 1.4 TEST BUILD
 
