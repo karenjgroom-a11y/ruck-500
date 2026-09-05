@@ -1,3 +1,10 @@
+RUCK 500 — VERSION 1.3 TEST BUILD
+
+Test-only correction:
+- All dates in January 2027 are temporarily unlocked for testing.
+- February–December 2027 remain protected by normal future-date logging rules.
+- No other functional or visual changes in this patch.
+
 RUCK 500 — VERSION 1.2 TEST BUILD
 
 Testing changes only:

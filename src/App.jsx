@@ -310,10 +310,9 @@ function addDays(dateKey, days) {
   d.setDate(d.getDate() + days);
   return d.toISOString().slice(0, 10);
 }
-const TEST_UNLOCK_DATE = "2027-01-01"; // TEMPORARY: remove before final public release
+const TEST_UNLOCK_MONTH = 0; // TEMPORARY: all January 2027 dates unlocked for testing only
 function isFutureChallengeDate(m, d) {
-  const dateKey = keyFor(m, d);
-  if (dateKey === TEST_UNLOCK_DATE) return false;
+  if (m === TEST_UNLOCK_MONTH) return false;
   const target = new Date(YEAR, m, d, 23, 59, 59, 999);
   return target > new Date();
 }
