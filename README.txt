@@ -1,3 +1,12 @@
+RUCK 500 — VERSION 1.2 TEST BUILD
+
+Testing changes only:
+- All of January 2027 is temporarily unlocked so weekly streak and multi-day logging can be tested.
+- Multiple milestone thresholds crossed in one save now celebrate in sequence (50, 100, 250, 500 as applicable).
+- Log modal is vertically scrollable with mobile safe-area space so Save/Delete controls remain reachable.
+- Horizontal page overflow is suppressed to prevent sideways white-page reveal on mobile.
+- 'Rucking Fitness Kent' wording has NOT been changed pending confirmation.
+
 RUCK 500 — VERSION 1.1 TEST BUILD
 
 Temporary testing update:
