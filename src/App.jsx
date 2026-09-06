@@ -22,7 +22,13 @@ const YEAR = 2027;
 const GOAL_MILES = 500;
 const STORAGE_LOGS = "ruck-log-2027";
 const STORAGE_NAME = "ruck-name-2027";
-const BACKUP_VERSION = "1.0";
+const STORAGE_CALORIE_SETTINGS = "ruck-calorie-settings-2027";
+const BACKUP_VERSION = "1.1";
+const REFERENCE_BODY_WEIGHT_KG = 78;
+const PANDOLF_SPEED_MPS = 3 * 0.44704; // fixed 3 mph
+const PANDOLF_GRADE_PERCENT = 0;
+const PANDOLF_TERRAIN_FACTOR = 1.0; // firm, level terrain
+const CALORIE_MODEL = "pandolf-v1";
 
 const MONTH_NAMES = [
   "January","February","March","April","May","June",
@@ -275,9 +281,53 @@ const STEPS_PER_MILE = 2100; // rucking stride is a touch shorter than a bare wa
 function estimateSteps(miles) {
   return Math.round(miles * STEPS_PER_MILE);
 }
-function estimateCalories(miles, weightKg) {
-  const caloriesPerMile = 100 + weightKg * 2.2; // base walking burn + load penalty
-  return Math.round(miles * caloriesPerMile);
+
+// Pandolf, Givoni & Goldman load-carriage equation.
+// Ruck 500 keeps logging simple, so pace, gradient and terrain are fixed:
+// 3 mph, 0% grade, firm/level terrain. Body weight is either the user's
+// optional private setting or the 78 kg reference adult.
+function estimateCalories(miles, loadKg, bodyWeightKg = REFERENCE_BODY_WEIGHT_KG) {
+  const distanceMiles = Math.max(0, Number(miles) || 0);
+  const load = Math.max(0, Number(loadKg) || 0);
+  const body = Math.max(1, Number(bodyWeightKg) || REFERENCE_BODY_WEIGHT_KG);
+  if (!distanceMiles) return 0;
+
+  const metabolicWatts =
+    1.5 * body +
+    2 * (body + load) * Math.pow(load / body, 2) +
+    PANDOLF_TERRAIN_FACTOR *
+      (body + load) *
+      (1.5 * Math.pow(PANDOLF_SPEED_MPS, 2) +
+        0.35 * PANDOLF_SPEED_MPS * PANDOLF_GRADE_PERCENT);
+
+  const durationSeconds = (distanceMiles / 3) * 3600;
+  return Math.round((metabolicWatts * durationSeconds) / 4184);
+}
+
+function migrateLogsToPandolf(sourceLogs) {
+  let changed = false;
+  const migrated = {};
+
+  for (const [dateKey, raw] of Object.entries(sourceLogs || {})) {
+    const entry = { ...raw };
+    const miles = parseFloat(entry.miles) || 0;
+    const loadKg = parseFloat(entry.weight) || 0;
+    const hasPandolfMetadata =
+      entry.calorieModel === CALORIE_MODEL &&
+      Number.isFinite(Number(entry.calorieBodyWeightKg));
+
+    if (!hasPandolfMetadata) {
+      entry.calorieModel = CALORIE_MODEL;
+      entry.calorieBodyWeightKg = REFERENCE_BODY_WEIGHT_KG;
+      entry.calorieBodyWeightSource = "standard";
+      entry.calories = estimateCalories(miles, loadKg, REFERENCE_BODY_WEIGHT_KG);
+      changed = true;
+    }
+
+    migrated[dateKey] = entry;
+  }
+
+  return { logs: migrated, changed };
 }
 
 // Milestone badges along the way to the 500-mile goal
@@ -310,13 +360,6 @@ function addDays(dateKey, days) {
   d.setDate(d.getDate() + days);
   return d.toISOString().slice(0, 10);
 }
-const TEST_UNLOCK_MONTH = 0; // TEMPORARY: all January 2027 dates unlocked for testing only
-function isFutureChallengeDate(m, d) {
-  if (m === TEST_UNLOCK_MONTH) return false;
-  const target = new Date(YEAR, m, d, 23, 59, 59, 999);
-  return target > new Date();
-}
-
 // A few puns to greet people on "Ruck to the Buzz" event days
 const JOKES = [
   "Rucking hell, that coffee smells good. 🎒☕",
@@ -346,6 +389,10 @@ export default function RuckChallenge() {
   const [saving, setSaving] = useState(false);
   const [toast, setToast] = useState("");
   const [name, setName] = useState("");
+  const [calorieMode, setCalorieMode] = useState("standard"); // standard | personal
+  const [personalBodyWeightKg, setPersonalBodyWeightKg] = useState("");
+  const [calorieSettingsOpen, setCalorieSettingsOpen] = useState(false);
+  const [calorieWeightDraft, setCalorieWeightDraft] = useState("");
   const [syncStatus, setSyncStatus] = useState("idle"); // idle | syncing | synced | error
   const [joke, setJoke] = useState("");
   const [achievementQueue, setAchievementQueue] = useState([]);
@@ -363,15 +410,36 @@ export default function RuckChallenge() {
   useEffect(() => {
     try {
       const rawLogs = localStorage.getItem(STORAGE_LOGS);
-      if (rawLogs) setLogs(JSON.parse(rawLogs));
+      if (rawLogs) {
+        const parsed = JSON.parse(rawLogs);
+        const migrated = migrateLogsToPandolf(parsed);
+        setLogs(migrated.logs);
+        if (migrated.changed) {
+          localStorage.setItem(STORAGE_LOGS, JSON.stringify(migrated.logs));
+        }
+      }
     } catch (e) {
       console.warn("Could not read saved ruck log", e);
     }
+
     try {
       const savedName = localStorage.getItem(STORAGE_NAME);
       if (savedName) setName(savedName);
     } catch (e) {
       console.warn("Could not read saved rucker name", e);
+    }
+
+    try {
+      const rawSettings = localStorage.getItem(STORAGE_CALORIE_SETTINGS);
+      if (rawSettings) {
+        const parsed = JSON.parse(rawSettings);
+        if (parsed?.mode === "personal" && Number.isFinite(Number(parsed?.bodyWeightKg))) {
+          setCalorieMode("personal");
+          setPersonalBodyWeightKg(String(Number(parsed.bodyWeightKg)));
+        }
+      }
+    } catch (e) {
+      console.warn("Could not read calorie settings", e);
     } finally {
       setLoaded(true);
     }
@@ -390,6 +458,59 @@ export default function RuckChallenge() {
       setSyncStatus("error");
       return false;
     }
+  }
+
+  const currentCalorieBodyWeightKg =
+    calorieMode === "personal" && Number.isFinite(Number(personalBodyWeightKg))
+      ? Number(personalBodyWeightKg)
+      : REFERENCE_BODY_WEIGHT_KG;
+
+  function openCalorieSettings() {
+    setCalorieWeightDraft(
+      calorieMode === "personal" && personalBodyWeightKg
+        ? String(personalBodyWeightKg)
+        : ""
+    );
+    setCalorieSettingsOpen(true);
+  }
+
+  function persistCalorieSettings(mode, bodyWeightKg = null) {
+    const settings =
+      mode === "personal"
+        ? { mode: "personal", bodyWeightKg: Number(bodyWeightKg) }
+        : { mode: "standard", bodyWeightKg: null };
+
+    try {
+      localStorage.setItem(STORAGE_CALORIE_SETTINGS, JSON.stringify(settings));
+      return true;
+    } catch (e) {
+      setSyncStatus("error");
+      return false;
+    }
+  }
+
+  function useStandardCalorieEstimate() {
+    setCalorieMode("standard");
+    setPersonalBodyWeightKg("");
+    persistCalorieSettings("standard");
+    setCalorieSettingsOpen(false);
+    setToast("Future rucks will use the standard 78 kg calorie estimate.");
+    setTimeout(() => setToast(""), 2600);
+  }
+
+  function savePersonalCalorieWeight() {
+    const bodyWeight = Number(calorieWeightDraft);
+    if (!Number.isFinite(bodyWeight) || bodyWeight < 25 || bodyWeight > 300) {
+      alert("Please enter a body weight between 25 and 300 kg.");
+      return;
+    }
+
+    setCalorieMode("personal");
+    setPersonalBodyWeightKg(String(bodyWeight));
+    persistCalorieSettings("personal", bodyWeight);
+    setCalorieSettingsOpen(false);
+    setToast("Personal calorie estimate saved for future rucks.");
+    setTimeout(() => setToast(""), 2600);
   }
 
   const totals = useMemo(() => {
@@ -456,14 +577,14 @@ export default function RuckChallenge() {
   const liveMiles = parseFloat(form.miles) || 0;
   const liveWeight = parseFloat(form.weight) || 0;
   const liveSteps = estimateSteps(liveMiles);
-  const liveCalories = estimateCalories(liveMiles, liveWeight);
+  const activeEntry = activeDate ? logs[keyFor(activeDate.m, activeDate.d)] : null;
+  const liveCalorieBodyWeightKg =
+    Number.isFinite(Number(activeEntry?.calorieBodyWeightKg))
+      ? Number(activeEntry.calorieBodyWeightKg)
+      : currentCalorieBodyWeightKg;
+  const liveCalories = estimateCalories(liveMiles, liveWeight, liveCalorieBodyWeightKg);
 
   function openDay(m, d) {
-    if (isFutureChallengeDate(m, d)) {
-      setToast("You can only log a ruck on the day or after it has happened.");
-      setTimeout(() => setToast(""), 2800);
-      return;
-    }
     const k = keyFor(m, d);
     const existing = logs[k];
     setForm(existing
@@ -510,13 +631,32 @@ export default function RuckChallenge() {
 
     setSaving(true);
     const k = keyFor(activeDate.m, activeDate.d);
-    // Clean validated values, then let the calculator fill in calories + steps
+    // Existing rucks retain the body-weight basis they were originally calculated with.
+    // New rucks use the current standard/personal calorie setting.
+    const existingEntry = logs[k];
+    const calorieBodyWeightKg =
+      Number.isFinite(Number(existingEntry?.calorieBodyWeightKg))
+        ? Number(existingEntry.calorieBodyWeightKg)
+        : currentCalorieBodyWeightKg;
+    const calorieBodyWeightSource =
+      existingEntry?.calorieBodyWeightSource === "personal"
+        ? "personal"
+        : existingEntry?.calorieBodyWeightSource === "standard"
+          ? "standard"
+          : calorieMode === "personal"
+            ? "personal"
+            : "standard";
+
     const entry = {
       miles,
       weight,
-      calories: estimateCalories(miles, weight),
+      calories: estimateCalories(miles, weight, calorieBodyWeightKg),
+      calorieModel: CALORIE_MODEL,
+      calorieBodyWeightKg,
+      calorieBodyWeightSource,
       steps: estimateSteps(miles),
-      loggedAt: new Date().toISOString(),
+      loggedAt: existingEntry?.loggedAt || new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
       ruckedBy: name.trim() || "Anonymous rucker",
     };
     const next = { ...logs, [k]: entry };
@@ -606,6 +746,10 @@ export default function RuckChallenge() {
       goalMiles: GOAL_MILES,
       exportedAt: new Date().toISOString(),
       name,
+      calorieSettings: {
+        mode: calorieMode,
+        bodyWeightKg: calorieMode === "personal" ? Number(personalBodyWeightKg) : null,
+      },
       logs,
     };
     const blob = new Blob([JSON.stringify(backup, null, 2)], { type: "application/json" });
@@ -632,10 +776,26 @@ export default function RuckChallenge() {
         }
         if (!confirm("Restore this backup? Your current Ruck 500 name and log on this device will be replaced.")) return;
         const restoredName = typeof backup.name === "string" ? backup.name : "";
+        const migrated = migrateLogsToPandolf(backup.logs);
+        const restoredSettings =
+          backup?.calorieSettings?.mode === "personal" &&
+          Number.isFinite(Number(backup?.calorieSettings?.bodyWeightKg))
+            ? {
+                mode: "personal",
+                bodyWeightKg: Number(backup.calorieSettings.bodyWeightKg),
+              }
+            : { mode: "standard", bodyWeightKg: null };
+
         setName(restoredName);
-        setLogs(backup.logs);
+        setLogs(migrated.logs);
+        setCalorieMode(restoredSettings.mode);
+        setPersonalBodyWeightKg(
+          restoredSettings.mode === "personal" ? String(restoredSettings.bodyWeightKg) : ""
+        );
+
         localStorage.setItem(STORAGE_NAME, restoredName);
-        localStorage.setItem(STORAGE_LOGS, JSON.stringify(backup.logs));
+        localStorage.setItem(STORAGE_LOGS, JSON.stringify(migrated.logs));
+        localStorage.setItem(STORAGE_CALORIE_SETTINGS, JSON.stringify(restoredSettings));
         setSyncStatus("synced");
         setToast("Backup restored.");
         setTimeout(() => setToast(""), 2400);
@@ -1033,13 +1193,23 @@ export default function RuckChallenge() {
           {[
             { icon: MapPin, label: "Miles rucked", value: totals.miles.toFixed(1) },
             { icon: Footprints, label: "Steps", value: totals.steps.toLocaleString() },
-            { icon: Flame, label: "Calories", value: totals.calories.toLocaleString() },
+            { icon: Flame, label: "Estimated calories", value: totals.calories.toLocaleString(), calorieInfo: true },
             { icon: Dumbbell, label: "Days rucked", value: totals.days },
           ].map((s, i) => (
             <div key={i} className="flex flex-col gap-1">
               <s.icon size={20} color={LIME} />
               <span className="display" style={{ color: LIME, fontSize: "1.6rem" }}>{s.value}</span>
-              <span className="text-white text-xs font-semibold opacity-80">{s.label}</span>
+              {s.calorieInfo ? (
+                <button
+                  onClick={openCalorieSettings}
+                  className="text-left text-white text-xs font-semibold opacity-80 underline decoration-dotted underline-offset-2"
+                  aria-label="About estimated calories and body weight setting"
+                >
+                  {s.label} ⓘ
+                </button>
+              ) : (
+                <span className="text-white text-xs font-semibold opacity-80">{s.label}</span>
+              )}
             </div>
           ))}
         </div>
@@ -1316,7 +1486,9 @@ export default function RuckChallenge() {
                   <span className="flex items-center gap-1 text-stone-600"><Footprints size={14} /> Est. steps</span>
                   <span className="font-bold" style={{ color: INK }}>{liveSteps.toLocaleString()}</span>
                 </div>
-                <p className="text-xs text-stone-400 mt-2">Calculated automatically from your miles and weight carried.</p>
+                <p className="text-xs text-stone-400 mt-2">
+                  Pandolf estimate using a 3 mph pace and level, firm terrain. Body weight uses your private setting or the standard 78 kg reference.
+                </p>
               </div>
             </div>
 
@@ -1415,6 +1587,95 @@ export default function RuckChallenge() {
                 {achievementQueue.length - 1} more achievement{achievementQueue.length - 1 === 1 ? "" : "s"} waiting
               </p>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* CALORIE ESTIMATE SETTINGS */}
+      {calorieSettingsOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-6 w-screen max-w-full overflow-x-hidden"
+          style={{ background: "rgba(13,13,13,0.72)", width: "100vw", maxWidth: "100vw" }}
+          onClick={() => setCalorieSettingsOpen(false)}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{ background: "white", borderRadius: 14, width: "100%", maxWidth: "24rem" }}
+            className="p-6 relative"
+          >
+            <button
+              onClick={() => setCalorieSettingsOpen(false)}
+              className="absolute top-4 right-4 text-stone-500"
+              aria-label="Close calorie estimate settings"
+            >
+              <X size={20} />
+            </button>
+
+            <p style={{ color: LIME_DARK }} className="text-xs font-bold uppercase tracking-wide mb-1">
+              Calorie estimate
+            </p>
+            <h3 className="display" style={{ fontSize: "1.45rem", color: INK }}>
+              How your estimate works
+            </h3>
+            <p className="text-sm text-stone-600 mt-2 leading-relaxed">
+              Ruck 500 uses the Pandolf load-carriage equation with your logged distance and carried weight,
+              assuming a 3 mph pace on level, firm terrain.
+            </p>
+
+            <div style={{ background: STONE, borderRadius: 10 }} className="p-4 mt-4">
+              <p className="text-sm font-semibold" style={{ color: INK }}>
+                {calorieMode === "personal"
+                  ? "Personal estimate is on"
+                  : "Standard estimate is on"}
+              </p>
+              <p className="text-xs text-stone-500 mt-1">
+                {calorieMode === "personal"
+                  ? "Your body weight is stored privately on this device and is never shown on the dashboard."
+                  : "The standard estimate uses a 78 kg reference adult."}
+              </p>
+            </div>
+
+            <button
+              onClick={useStandardCalorieEstimate}
+              style={{
+                background: calorieMode === "standard" ? INK : "white",
+                color: calorieMode === "standard" ? LIME : INK,
+                border: `1.5px solid ${INK}`,
+                borderRadius: 8,
+              }}
+              className="w-full mt-4 py-3 px-4 text-sm font-semibold text-left"
+            >
+              Use standard 78 kg estimate
+            </button>
+
+            <div className="mt-3">
+              <label className="text-sm font-semibold text-stone-700">
+                Or personalise with my body weight (kg)
+                <input
+                  type="number"
+                  inputMode="decimal"
+                  step="0.1"
+                  min="25"
+                  max="300"
+                  value={calorieWeightDraft}
+                  onChange={(e) => setCalorieWeightDraft(e.target.value)}
+                  placeholder="e.g. 78"
+                  className="mt-1 w-full min-w-0 max-w-full border rounded-md px-3 py-2 font-normal text-base"
+                  style={{ borderColor: "#ddd" }}
+                />
+              </label>
+              <button
+                onClick={savePersonalCalorieWeight}
+                style={{ background: INK, color: LIME, borderRadius: 8 }}
+                className="w-full mt-2 py-3 px-4 text-sm font-semibold"
+              >
+                Save personal estimate
+              </button>
+            </div>
+
+            <p className="text-xs text-stone-400 mt-4 leading-relaxed">
+              Changing this setting affects new rucks only. Existing rucks keep the calorie estimate and body-weight basis used when they were logged.
+            </p>
           </div>
         </div>
       )}

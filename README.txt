@@ -1,3 +1,34 @@
+RUCK 500 — VERSION 1.7 FINAL
+
+Final targeted changes:
+1. Replaced the previous calorie rule with the Pandolf load-carriage equation.
+   Fixed assumptions: 3 mph, 0% grade, firm/level terrain.
+   Default body weight: 78 kg reference adult.
+2. Added optional private body-weight personalisation through the
+   Estimated calories information control. It is editable at any time and
+   never displayed on the shareable dashboard.
+3. Each ruck stores the body-weight basis and Pandolf calorie result used
+   when it was logged. Later body-weight changes affect new rucks only.
+   Editing an older ruck keeps that ruck's original body-weight basis.
+4. Existing pre-Pandolf rucks are migrated once to the 78 kg Pandolf
+   baseline so historical dashboard totals are internally consistent.
+5. Backup/Restore now includes the current calorie preference, and older
+   backups are migrated safely when restored.
+6. All dates in 2027 are permanently open for logging. The temporary
+   January exception and future-date restriction have been removed.
+
+Preserved from V1.6:
+- central mileage/streak achievement queue
+- cumulative 7-day streak blocks and pop-ups
+- live milestone rollback/re-achievement behaviour
+- 50 / 100 / 250 / 500 milestone badges
+- one-page centred certificate print
+- mobile width containment and iPhone input behaviour
+- internally scrollable logging modal
+- sticky Save/Delete controls
+- Backup/Restore
+- all original visuals, embedded images, Buzz events, branding and concept
+
 RUCK 500 — VERSION 1.6 TEST BUILD
 
 Built from the stable V1.4 mobile foundation.
