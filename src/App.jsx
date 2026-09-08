@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo, useRef } from "react";
+import BuzzEvent from "./BuzzEvent.jsx";
 import { Coffee, MapPin, Footprints, Flame, Dumbbell, X, Check, Heart, Mountain, ChevronRight, Backpack, Leaf, Trophy, Repeat, Award, Maximize2 } from "lucide-react";
 
 // ---------- Brand tokens ----------
@@ -37,7 +38,7 @@ const MONTH_NAMES = [
 
 // One "Ruck to the Buzz" Saturday per month — 10km, alternating Sandwich <-> Deal
 const EVENTS = [
-  { month: 0, day: 9,  name: "New Year Buzz Ruck",     from: "Sandwich", to: "Deal",     scene: "bay",  drink: "cocoa",  photo: EVENT_PHOTO_1 },
+  { month: 0, day: 9,  name: "New Year Buzz Ruck",     from: "Minnis Bay", to: "Reculver", scene: "bay", drink: "cocoa", photo: EVENT_PHOTO_1, distanceKm: 12, loop: true, integrated: true },
   { month: 1, day: 13, name: "Frosty Flask Ruck",       from: "Deal",     to: "Sandwich", scene: "pier", drink: "cocoa",  photo: EVENT_PHOTO_2 },
   { month: 2, day: 13, name: "Spring Awakening Ruck",   from: "Sandwich", to: "Deal",     scene: "bay",  drink: "coffee", photo: EVENT_PHOTO_5 },
   { month: 3, day: 10, name: "Blossom Buzz Ruck",       from: "Deal",     to: "Sandwich", scene: "pier", drink: "coffee", photo: EVENT_PHOTO_4 },
@@ -400,6 +401,8 @@ export default function RuckChallenge() {
   const [certificateOpen, setCertificateOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [eventDetail, setEventDetail] = useState(null); // the EVENTS entry currently open
+  const [buzzEventOpen, setBuzzEventOpen] = useState(false);
+  const [buzzReturnTo, setBuzzReturnTo] = useState(null); // { type: "home" } or { type: "calendar", m, d }
   const logsRef = useRef(logs);
   const restoreInputRef = useRef(null);
 
@@ -583,6 +586,32 @@ export default function RuckChallenge() {
       ? Number(activeEntry.calorieBodyWeightKg)
       : currentCalorieBodyWeightKg;
   const liveCalories = estimateCalories(liveMiles, liveWeight, liveCalorieBodyWeightKg);
+
+  function openBuzzEventFromHome() {
+    setEventDetail(null);
+    setBuzzReturnTo({ type: "home" });
+    setBuzzEventOpen(true);
+  }
+
+  function openBuzzEventFromCalendar(m, d) {
+    setActiveDate(null);
+    setBuzzReturnTo({ type: "calendar", m, d });
+    setBuzzEventOpen(true);
+  }
+
+  function closeBuzzEvent() {
+    const destination = buzzReturnTo;
+    setBuzzEventOpen(false);
+    setBuzzReturnTo(null);
+
+    if (destination?.type === "calendar") {
+      setTimeout(() => openDay(destination.m, destination.d), 0);
+    } else {
+      setTimeout(() => {
+        document.getElementById("ruck-to-the-buzz")?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 0);
+    }
+  }
 
   function openDay(m, d) {
     const k = keyFor(m, d);
@@ -1241,7 +1270,7 @@ export default function RuckChallenge() {
       </section>
 
       {/* RUCK TO THE BUZZ EVENTS */}
-      <section className="px-6 py-12 max-w-3xl mx-auto">
+      <section className="px-6 py-12 max-w-3xl mx-auto" id="ruck-to-the-buzz">
         <div className="flex items-center gap-2 mb-1">
           <Coffee size={20} color={INK} />
           <h2 className="display" style={{ fontSize: "1.8rem", color: INK }}>Ruck to the Buzz</h2>
@@ -1254,7 +1283,7 @@ export default function RuckChallenge() {
           {EVENTS.map((e, i) => (
             <button
               key={i}
-              onClick={() => setEventDetail(e)}
+              onClick={() => e.integrated ? openBuzzEventFromHome() : setEventDetail(e)}
               style={{ background: INK, borderRadius: 10, border: `2px dashed ${LIME_DARK}`, overflow: "hidden", textAlign: "left", padding: 0 }}
               className="flex flex-col gap-2 hover:opacity-90 transition"
             >
@@ -1266,19 +1295,45 @@ export default function RuckChallenge() {
                   <span style={{ color: LIME }} className="text-xs font-bold uppercase tracking-wide">
                     {MONTH_NAMES[e.month]} {e.day}
                   </span>
-                  <span className="text-stone-400 text-xs">10K</span>
+                  <span className="text-stone-400 text-xs">{e.distanceKm ? `${e.distanceKm}K` : "10K"}</span>
                 </div>
                 <span className="text-white font-semibold" style={{ fontSize: "1.05rem" }}>{e.name}</span>
-                <div className="flex items-center gap-1 text-stone-300 text-sm">
-                  <span>{e.from}</span>
-                  <ChevronRight size={14} color={LIME} />
-                  <span>{e.to}</span>
-                </div>
+                {e.loop ? (
+                  <div
+                    className="mt-1 rounded-lg px-2 py-2"
+                    style={{ border: `1px solid ${CHARCOAL}`, background: "#111" }}
+                    aria-label={`${e.distanceKm} kilometre loop from ${e.from} to ${e.to} and back`}
+                  >
+                    <svg viewBox="0 0 310 82" width="100%" role="img" aria-hidden="true">
+                      <defs>
+                        <marker id="buzz-loop-arrow" markerWidth="7" markerHeight="7" refX="5.5" refY="3.5" orient="auto">
+                          <path d="M0,0 L7,3.5 L0,7 Z" fill={LIME} />
+                        </marker>
+                      </defs>
+                      <path d="M73 24 C112 2 196 2 237 24" fill="none" stroke={LIME} strokeWidth="3.5" strokeLinecap="round" markerEnd="url(#buzz-loop-arrow)" />
+                      <path d="M237 57 C197 79 112 79 73 57" fill="none" stroke={LIME} strokeWidth="3.5" strokeLinecap="round" markerEnd="url(#buzz-loop-arrow)" />
+                      <circle cx="66" cy="41" r="8" fill={LIME} />
+                      <circle cx="244" cy="41" r="8" fill={LIME} />
+                      <text x="19" y="45" fill="#D8D8D2" fontSize="12" fontWeight="700">MINNIS BAY</text>
+                      <text x="252" y="45" fill="#D8D8D2" fontSize="12" fontWeight="700">RECULVER</text>
+                      <text x="155" y="38" fill="white" fontSize="18" fontWeight="800" textAnchor="middle">{e.distanceKm}K</text>
+                      <text x="155" y="55" fill="#BDBDB8" fontSize="10" fontWeight="700" textAnchor="middle">LOOP</text>
+                    </svg>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-1 text-stone-300 text-sm">
+                    <span>{e.from}</span>
+                    <ChevronRight size={14} color={LIME} />
+                    <span>{e.to}</span>
+                  </div>
+                )}
                 <div className="flex items-center gap-1 text-stone-400 text-xs mt-1">
                   <Heart size={12} color={LIME} />
                   <span>£1 donation · full menu at the Buzz below</span>
                 </div>
-                <span style={{ color: LIME }} className="text-xs font-semibold mt-1">Tap to view →</span>
+                <span style={{ color: LIME }} className="text-xs font-semibold mt-1">
+                  {e.integrated ? "Reveal the Buzz Ruck →" : "Tap to view →"}
+                </span>
               </div>
             </button>
           ))}
@@ -1448,6 +1503,17 @@ export default function RuckChallenge() {
                 <span style={{ fontSize: "1.4rem" }} className="wiggle">☕</span>
                 <p style={{ color: INK }} className="text-sm font-semibold leading-snug">{joke}</p>
               </div>
+            )}
+
+            {activeDate.m === 0 && activeDate.d === 9 && (
+              <button
+                onClick={() => openBuzzEventFromCalendar(activeDate.m, activeDate.d)}
+                style={{ background: INK, color: LIME, borderRadius: 10, border: `2px solid ${LIME_DARK}` }}
+                className="w-full py-3 px-4 mb-4 font-semibold flex items-center justify-center gap-2"
+              >
+                <MapPin size={17} />
+                Reveal the Buzz Ruck
+              </button>
             )}
 
             <div className="flex flex-col gap-3">
@@ -1751,6 +1817,13 @@ export default function RuckChallenge() {
         <div className="fixed inset-0 flex items-center justify-center" style={{ background: LIME }}>
           <p style={{ color: INK }} className="opacity-70 font-semibold">Loading your log…</p>
         </div>
+      )}
+      {buzzEventOpen && (
+        <BuzzEvent
+          onExit={closeBuzzEvent}
+          eventId="jan2027"
+          ruck500Name={name}
+        />
       )}
     </div>
   );

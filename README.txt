@@ -1,3 +1,25 @@
+RUCK 500 — VERSION 1.8 FINAL
+
+January Buzz Ruck integration:
+- Integrated the 9 January New Year Buzz Ruck directly inside Ruck 500.
+- Two entry points open the same internal event module:
+  1) the January event card on the Ruck to the Buzz section;
+  2) a new "Reveal the Buzz Ruck" button in the 9 January normal log panel.
+- Return behaviour remembers where the event was opened from.
+- January route corrected to a 12 km Minnis Bay → Reculver → Minnis Bay loop.
+- January event card uses a responsive circular loop graphic.
+- Neil's event journey retained: local sign-up, start timer, sequential photo
+  checkpoints, finish flow and photo certificate.
+- Removed all admin, shared participant, passcode, CSV and central-storage concepts.
+- Event progress is private localStorage data on the user's device.
+- Checkpoint photos are compressed and stored privately in IndexedDB.
+- Event progress resumes after leaving/reopening the event.
+- Completion wording now tells users to show the completed certificate at the Buzz.
+- Completing the event does not auto-log mileage into Ruck 500; normal mileage/load
+  logging remains separate to protect totals, calories and streaks.
+
+Everything else from V1.7 is intentionally preserved.
+
 RUCK 500 — VERSION 1.7 FINAL
 
 Final targeted changes:
