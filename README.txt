@@ -1,3 +1,13 @@
+RUCK 500 — VERSION 1.9.2 FINAL
+
+Tiny welcome/certificate correction only:
+- Replaced the WELCOME pill on the Buzz event welcome screen with the approved
+  Coffee Buzz van graphic.
+- Changed welcome heading to "WELCOME TO THE BUZZ RUCK, [NAME]".
+- Changed certificate branding from "RUCK BUZZ" to "BUZZ RUCK" both on-screen
+  and in the saved/shared certificate image.
+- Everything else from V1.9.1 is intentionally unchanged.
+
 RUCK 500 — VERSION 1.9.1 FINAL
 
 Targeted January card / entry-flow refinement:

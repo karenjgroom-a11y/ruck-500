@@ -320,7 +320,7 @@ export default function BuzzEvent({ onExit, ruck500Name = "" }) {
     ctx.font = "300 20px Georgia, serif";
     ctx.fillText("C E R T I F I C A T E   O F   C O M P L E T I O N", W / 2, 120);
     ctx.font = "700 42px Arial";
-    ctx.fillText("RUCK BUZZ", W / 2, 177);
+    ctx.fillText("BUZZ RUCK", W / 2, 177);
     ctx.font = "16px Arial";
     ctx.fillText(EVENT.route, W / 2, 208);
     ctx.font = "700 52px Arial";
@@ -459,8 +459,13 @@ export default function BuzzEvent({ onExit, ruck500Name = "" }) {
         {topbar}
         <div className="min-h-[calc(100dvh-52px)] flex items-center">
           <div className="max-w-md mx-auto w-full px-5 py-8 text-center">
-            <span className="inline-block border rounded-full px-4 py-1.5 text-xs font-bold tracking-widest mb-5" style={{ borderColor: LIME, color: LIME }}>WELCOME</span>
-            <h1 className="display" style={{ color: LIME, fontSize: "3rem", lineHeight: 0.95 }}>WELCOME TO<br />THE RUCK,<br />{displayName().toUpperCase()}</h1>
+            <img
+              src="/coffee-buzz-van-welcome.jpg"
+              alt="Coffee Buzz van"
+              className="mx-auto mb-4"
+              style={{ width: 165, maxWidth: "52vw", height: "auto", display: "block" }}
+            />
+            <h1 className="display" style={{ color: LIME, fontSize: "3rem", lineHeight: 0.95 }}>WELCOME TO<br />THE BUZZ RUCK,<br />{displayName().toUpperCase()}</h1>
             <p className="mt-5 text-sm opacity-70">Start when you're ready at Minnis Bay.</p>
             <button onClick={doStart} className="w-full py-4 rounded-full font-bold text-lg mt-7" style={{ background: LIME, color: INK }}>START RUCK</button>
           </div>
@@ -539,7 +544,7 @@ export default function BuzzEvent({ onExit, ruck500Name = "" }) {
 
           <div className="rounded-2xl p-5 text-center" style={{ background: CREAM, color: INK, border: `5px double ${INK}` }}>
             <p className="text-xs font-bold tracking-[0.18em] opacity-60">CERTIFICATE OF COMPLETION</p>
-            <p className="font-bold mt-2">RUCK BUZZ</p>
+            <p className="font-bold mt-2">BUZZ RUCK</p>
             <h2 className="display mt-3" style={{ fontSize: "2.2rem", color: INK }}>{displayName()}</h2>
             <p className="text-sm">has completed the {EVENT.distanceMiles} mile ruck{allDone ? ", all checkpoints stamped" : ""}.</p>
             <div className="grid grid-cols-2 gap-3 mt-4 text-sm">
