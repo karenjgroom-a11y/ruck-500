@@ -1,3 +1,29 @@
+RUCK 500 — VERSION 1.9 FINAL
+
+Combined January Buzz polish + reset update:
+- Added a stylised Reculver Towers graphic to the January Buzz card and event landing.
+- Removed the brown event palette and aligned Buzz screens/certificate to black, lime, charcoal and off-white.
+- Preserved the 7.5 mile wording, loop-label fixes, mobile width lock and safe-area finish controls.
+- Added Reset this Buzz Ruck with confirmation.
+- Reset clears only January Buzz local progress, checkpoint photos, start/finish times and certificate.
+- Reset does not affect the main Ruck 500 log, calories, streaks, milestones, name, body-weight setting or backups.
+- Event photos remain private in IndexedDB and event progress remains private localStorage.
+
+Everything else from V1.8.1/V1.7 is preserved.
+
+RUCK 500 — VERSION 1.8.1 FINAL PATCH
+
+Targeted January Buzz fixes only:
+- Stronger horizontal containment to stop mobile side-to-side wobble.
+- Loop graphic labels repositioned so Minnis Bay and Reculver are unobscured.
+- January route displayed consistently as a 7.5 mile loop.
+- Ruck to the Buzz intro made route-neutral for differing monthly events.
+- Finish action made sticky with iPhone safe-area padding.
+- Final confirmation button given extra safe-area clearance.
+- No event-reset/clear function added in this patch.
+
+Everything else from V1.8/V1.7 is preserved.
+
 RUCK 500 — VERSION 1.8 FINAL
 
 January Buzz Ruck integration:

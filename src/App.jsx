@@ -840,7 +840,7 @@ export default function RuckChallenge() {
   return (
     <div
       className="app-shell"
-      style={{ background: LIME, minHeight: "100vh", fontFamily: "'Barlow', system-ui, sans-serif" }}
+      style={{ background: LIME, minHeight: "100vh", width: "100%", maxWidth: "100vw", overflowX: "clip", fontFamily: "'Barlow', system-ui, sans-serif" }}
     >
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Anton&family=Barlow:wght@400;500;600;700;800&family=Caveat:wght@600;700&display=swap');
@@ -1276,8 +1276,7 @@ export default function RuckChallenge() {
           <h2 className="display" style={{ fontSize: "1.8rem", color: INK }}>Ruck to the Buzz</h2>
         </div>
         <p style={{ color: INK }} className="opacity-70 mb-6 max-w-lg">
-          One Saturday a month, ruck the 10K between Sandwich and Deal and meet the Coffee Buzz VW ID Buzz
-          at the finish — coffee and hot chocolate on us, just a £1 donation to keep the pods and cocoa flowing.
+          One Saturday a month, take on a special Ruck to the Buzz route and meet the Coffee Buzz VW ID Buzz at the finish — coffee and hot chocolate on us, just a £1 donation to keep the pods and cocoa flowing.
         </p>
         <div className="grid sm:grid-cols-2 gap-3">
           {EVENTS.map((e, i) => (
@@ -1295,31 +1294,40 @@ export default function RuckChallenge() {
                   <span style={{ color: LIME }} className="text-xs font-bold uppercase tracking-wide">
                     {MONTH_NAMES[e.month]} {e.day}
                   </span>
-                  <span className="text-stone-400 text-xs">{e.distanceKm ? `${e.distanceKm}K` : "10K"}</span>
+                  <span className="text-stone-400 text-xs">{e.integrated ? "7.5 MI" : (e.distanceKm ? `${e.distanceKm}K` : "10K")}</span>
                 </div>
                 <span className="text-white font-semibold" style={{ fontSize: "1.05rem" }}>{e.name}</span>
                 {e.loop ? (
-                  <div
+                  <>
+                    <div className="flex justify-center mt-1" aria-hidden="true">
+                      <svg viewBox="0 0 180 110" width="92" height="56" style={{ display: "block" }}>
+                        <path d="M28 94 L28 39 L47 39 L47 24 L64 24 L64 94 Z M116 94 L116 24 L133 24 L133 39 L152 39 L152 94 Z M64 94 L64 48 L74 48 L74 38 L106 38 L106 48 L116 48 L116 94 Z" fill={LIME} />
+                        <path d="M38 94 V56 H54 V94 Z M126 94 V56 H142 V94 Z M78 94 V64 Q90 49 102 64 V94 Z" fill={INK} />
+                        <path d="M18 96 H162" stroke={LIME} strokeWidth="4" strokeLinecap="round" />
+                      </svg>
+                    </div>
+                    <div
                     className="mt-1 rounded-lg px-2 py-2"
                     style={{ border: `1px solid ${CHARCOAL}`, background: "#111" }}
                     aria-label={`${e.distanceKm} kilometre loop from ${e.from} to ${e.to} and back`}
                   >
-                    <svg viewBox="0 0 310 82" width="100%" role="img" aria-hidden="true">
+                    <svg viewBox="0 0 340 90" width="100%" role="img" aria-hidden="true" style={{ display: "block", maxWidth: "100%" }}>
                       <defs>
                         <marker id="buzz-loop-arrow" markerWidth="7" markerHeight="7" refX="5.5" refY="3.5" orient="auto">
                           <path d="M0,0 L7,3.5 L0,7 Z" fill={LIME} />
                         </marker>
                       </defs>
-                      <path d="M73 24 C112 2 196 2 237 24" fill="none" stroke={LIME} strokeWidth="3.5" strokeLinecap="round" markerEnd="url(#buzz-loop-arrow)" />
-                      <path d="M237 57 C197 79 112 79 73 57" fill="none" stroke={LIME} strokeWidth="3.5" strokeLinecap="round" markerEnd="url(#buzz-loop-arrow)" />
-                      <circle cx="66" cy="41" r="8" fill={LIME} />
-                      <circle cx="244" cy="41" r="8" fill={LIME} />
-                      <text x="19" y="45" fill="#D8D8D2" fontSize="12" fontWeight="700">MINNIS BAY</text>
-                      <text x="252" y="45" fill="#D8D8D2" fontSize="12" fontWeight="700">RECULVER</text>
-                      <text x="155" y="38" fill="white" fontSize="18" fontWeight="800" textAnchor="middle">{e.distanceKm}K</text>
-                      <text x="155" y="55" fill="#BDBDB8" fontSize="10" fontWeight="700" textAnchor="middle">LOOP</text>
+                      <path d="M96 27 C136 7 204 7 244 27" fill="none" stroke={LIME} strokeWidth="3.5" strokeLinecap="round" markerEnd="url(#buzz-loop-arrow)" />
+                      <path d="M244 63 C204 83 136 83 96 63" fill="none" stroke={LIME} strokeWidth="3.5" strokeLinecap="round" markerEnd="url(#buzz-loop-arrow)" />
+                      <circle cx="88" cy="45" r="7" fill={LIME} />
+                      <circle cx="252" cy="45" r="7" fill={LIME} />
+                      <text x="8" y="49" fill="#D8D8D2" fontSize="11.5" fontWeight="700">MINNIS BAY</text>
+                      <text x="265" y="49" fill="#D8D8D2" fontSize="11.5" fontWeight="700">RECULVER</text>
+                      <text x="170" y="40" fill="white" fontSize="18" fontWeight="800" textAnchor="middle">7.5 MI</text>
+                      <text x="170" y="57" fill="#BDBDB8" fontSize="10" fontWeight="700" textAnchor="middle">LOOP</text>
                     </svg>
                   </div>
+                  </>
                 ) : (
                   <div className="flex items-center gap-1 text-stone-300 text-sm">
                     <span>{e.from}</span>

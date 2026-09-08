@@ -6,7 +6,7 @@ const LIME_DEEP = "#9FB800";
 const INK = "#0D0D0D";
 const INK_SOFT = "#1A1A1A";
 const CREAM = "#F3F3EE";
-const COFFEE = "#3B2417";
+const COFFEE = INK; // visual palette aligned to Ruck 500
 const KHAKI = "#767A54";
 
 const EVENT = {
@@ -14,6 +14,7 @@ const EVENT = {
   name: "New Year Buzz Ruck",
   route: "Minnis Bay → Reculver → Minnis Bay",
   distanceKm: 12,
+  distanceMiles: 7.5,
   dateStr: "9 January 2027",
   meetPoint: "Minnis Bay Car Park",
   meetTime: "1:00 PM",
@@ -88,6 +89,22 @@ async function putPhoto(key, value) {
   });
 }
 
+async function deletePhoto(key) {
+  const db = await openDb();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE_NAME, "readwrite");
+    tx.objectStore(STORE_NAME).delete(key);
+    tx.oncomplete = () => { db.close(); resolve(); };
+    tx.onerror = () => { db.close(); reject(tx.error); };
+  });
+}
+
+async function clearEventPhotos(eventId) {
+  for (const cp of EVENT.checkpoints) {
+    try { await deletePhoto(`${eventId}:${cp.id}`); } catch {}
+  }
+}
+
 function compressImage(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -132,22 +149,36 @@ function fmtElapsed(ms) {
   return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
 }
 
+
+function ReculverTowersGraphic({ compact = false }) {
+  const w = compact ? 110 : 170;
+  const h = compact ? 66 : 102;
+  return (
+    <svg viewBox="0 0 180 110" width={w} height={h} role="img" aria-label="Stylised Reculver Towers" style={{ display: "block", maxWidth: "100%", margin: "0 auto" }}>
+      <path d="M28 94 L28 39 L47 39 L47 24 L64 24 L64 94 Z M116 94 L116 24 L133 24 L133 39 L152 39 L152 94 Z M64 94 L64 48 L74 48 L74 38 L106 38 L106 48 L116 48 L116 94 Z" fill={LIME} />
+      <path d="M38 94 V56 H54 V94 Z M126 94 V56 H142 V94 Z M78 94 V64 Q90 49 102 64 V94 Z" fill={INK} opacity="0.96" />
+      <rect x="83" y="47" width="14" height="9" rx="1" fill={INK} opacity="0.96" />
+      <path d="M18 96 H162" stroke={LIME} strokeWidth="4" strokeLinecap="round" />
+    </svg>
+  );
+}
+
 function LoopGraphic() {
   return (
-    <svg viewBox="0 0 330 110" width="100%" role="img" aria-label="12 kilometre loop from Minnis Bay to Reculver and back">
+    <svg viewBox="0 0 360 118" width="100%" role="img" aria-label="7.5 mile loop from Minnis Bay to Reculver and back" style={{ display: "block", maxWidth: "100%" }}>
       <defs>
         <marker id="event-loop-arrow" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
           <path d="M0,0 L8,4 L0,8 Z" fill={LIME} />
         </marker>
       </defs>
-      <path d="M75 32 C120 4 211 4 256 32" fill="none" stroke={LIME} strokeWidth="4" strokeLinecap="round" markerEnd="url(#event-loop-arrow)" />
-      <path d="M256 76 C211 104 120 104 75 76" fill="none" stroke={LIME} strokeWidth="4" strokeLinecap="round" markerEnd="url(#event-loop-arrow)" />
-      <circle cx="66" cy="54" r="9" fill={LIME} />
-      <circle cx="265" cy="54" r="9" fill={LIME} />
-      <text x="8" y="58" fill={CREAM} fontSize="13" fontWeight="700">MINNIS BAY</text>
-      <text x="278" y="58" fill={CREAM} fontSize="13" fontWeight="700">RECULVER</text>
-      <text x="165" y="50" fill="white" fontSize="22" fontWeight="800" textAnchor="middle">12K</text>
-      <text x="165" y="70" fill="#BDBDB8" fontSize="11" fontWeight="700" textAnchor="middle">LOOP</text>
+      <path d="M108 34 C148 8 212 8 252 34" fill="none" stroke={LIME} strokeWidth="4" strokeLinecap="round" markerEnd="url(#event-loop-arrow)" />
+      <path d="M252 82 C212 108 148 108 108 82" fill="none" stroke={LIME} strokeWidth="4" strokeLinecap="round" markerEnd="url(#event-loop-arrow)" />
+      <circle cx="98" cy="58" r="9" fill={LIME} />
+      <circle cx="262" cy="58" r="9" fill={LIME} />
+      <text x="8" y="62" fill={CREAM} fontSize="12" fontWeight="700">MINNIS BAY</text>
+      <text x="278" y="62" fill={CREAM} fontSize="12" fontWeight="700">RECULVER</text>
+      <text x="180" y="54" fill="white" fontSize="22" fontWeight="800" textAnchor="middle">7.5 MI</text>
+      <text x="180" y="74" fill="#BDBDB8" fontSize="11" fontWeight="700" textAnchor="middle">LOOP</text>
     </svg>
   );
 }
@@ -283,6 +314,32 @@ export default function BuzzEvent({ onExit, ruck500Name = "" }) {
     }
   }
 
+  async function resetEvent() {
+    const ok = confirm(
+      "Reset this Buzz Ruck? This removes your January Buzz Ruck progress, checkpoint photos, start/finish times and certificate from this device. Your main Ruck 500 log will not be affected."
+    );
+    if (!ok) return;
+
+    Object.values(photos).forEach((url) => {
+      try { URL.revokeObjectURL(url); } catch {}
+    });
+
+    try { localStorage.removeItem(META_KEY); } catch {}
+    await clearEventPhotos(EVENT.id);
+
+    const fresh = blankParticipant(ruck500Name);
+    setParticipant(fresh);
+    setFirstName(fresh.firstName || "");
+    setSurname(fresh.surname || "");
+    setNickname("");
+    setPhotos({});
+    setPendingPhoto(null);
+    setActiveCpId(null);
+    setNow(Date.now());
+    setScreen("landing");
+    showToast("January Buzz Ruck reset.");
+  }
+
   function doFinish() {
     const next = { ...participant, finishTime: Date.now() };
     persistParticipant(next);
@@ -294,11 +351,11 @@ export default function BuzzEvent({ onExit, ruck500Name = "" }) {
     const canvas = document.createElement("canvas");
     canvas.width = W; canvas.height = H;
     const ctx = canvas.getContext("2d");
-    ctx.fillStyle = COFFEE; ctx.fillRect(0, 0, W, H);
+    ctx.fillStyle = INK; ctx.fillRect(0, 0, W, H);
     ctx.fillStyle = CREAM; ctx.fillRect(30, 30, W - 60, H - 60);
-    ctx.strokeStyle = COFFEE; ctx.lineWidth = 6; ctx.strokeRect(48, 48, W - 96, H - 96);
-    ctx.strokeStyle = COFFEE; ctx.lineWidth = 2; ctx.strokeRect(58, 58, W - 116, H - 116);
-    ctx.textAlign = "center"; ctx.fillStyle = COFFEE;
+    ctx.strokeStyle = INK; ctx.lineWidth = 6; ctx.strokeRect(48, 48, W - 96, H - 96);
+    ctx.strokeStyle = LIME; ctx.lineWidth = 3; ctx.strokeRect(58, 58, W - 116, H - 116);
+    ctx.textAlign = "center"; ctx.fillStyle = INK;
     ctx.font = "300 20px Georgia, serif";
     ctx.fillText("C E R T I F I C A T E   O F   C O M P L E T I O N", W / 2, 120);
     ctx.font = "700 42px Arial";
@@ -308,11 +365,11 @@ export default function BuzzEvent({ onExit, ruck500Name = "" }) {
     ctx.font = "700 52px Arial";
     ctx.fillText(displayName(), W / 2, 285);
     ctx.font = "16px Arial";
-    ctx.fillText(`has completed the ${EVENT.distanceKm}km ruck${allDone ? ", all checkpoints stamped" : ""}.`, W / 2, 323);
+    ctx.fillText(`has completed the ${EVENT.distanceMiles} mile ruck${allDone ? ", all checkpoints stamped" : ""}.`, W / 2, 323);
     ctx.font = "13px Arial"; ctx.fillStyle = KHAKI;
     ctx.fillText("DATE", W / 2 - 150, 374);
     ctx.fillText("TOTAL TIME", W / 2 + 150, 374);
-    ctx.font = "700 20px Arial"; ctx.fillStyle = COFFEE;
+    ctx.font = "700 20px Arial"; ctx.fillStyle = INK;
     ctx.fillText(fmtDate(participant.finishTime), W / 2 - 150, 402);
     ctx.fillText(fmtElapsed(participant.finishTime - participant.startTime), W / 2 + 150, 402);
 
@@ -335,8 +392,8 @@ export default function BuzzEvent({ onExit, ruck500Name = "" }) {
           ctx.restore();
         }
       }
-      ctx.strokeStyle = COFFEE; ctx.lineWidth = 3; ctx.strokeRect(x, rowY, thumb, thumb);
-      ctx.fillStyle = COFFEE; ctx.font = "600 13px Arial";
+      ctx.strokeStyle = INK; ctx.lineWidth = 3; ctx.strokeRect(x, rowY, thumb, thumb);
+      ctx.fillStyle = INK; ctx.font = "600 13px Arial";
       ctx.fillText(cp.name, x + thumb / 2, rowY + thumb + 22);
       x += thumb + gap;
     }
@@ -361,9 +418,20 @@ export default function BuzzEvent({ onExit, ruck500Name = "" }) {
   }
 
   const shell = {
-    position: "fixed", inset: 0, zIndex: 80, overflowY: "auto", overflowX: "hidden",
-    background: INK, color: CREAM, fontFamily: "'Barlow', system-ui, sans-serif",
-    width: "100vw", maxWidth: "100vw", WebkitOverflowScrolling: "touch",
+    position: "fixed",
+    inset: 0,
+    zIndex: 80,
+    overflowY: "auto",
+    overflowX: "clip",
+    overscrollBehaviorX: "none",
+    touchAction: "pan-y",
+    background: INK,
+    color: CREAM,
+    fontFamily: "'Barlow', system-ui, sans-serif",
+    width: "100%",
+    maxWidth: "100vw",
+    minWidth: 0,
+    WebkitOverflowScrolling: "touch",
   };
 
   const topbar = (
@@ -388,7 +456,8 @@ export default function BuzzEvent({ onExit, ruck500Name = "" }) {
             <span className="inline-block border-2 rounded-full px-4 py-1.5 text-xs font-bold tracking-widest mb-5" style={{ borderColor: INK }}>ONE-DAY EVENT</span>
             <h1 className="display" style={{ fontSize: "3.5rem", lineHeight: 0.9 }}>NEW YEAR<br />BUZZ RUCK</h1>
             <p className="font-bold mt-4">9 January 2027 · Minnis Bay</p>
-            <div style={{ background: INK, borderRadius: 16 }} className="mt-5 p-4"><LoopGraphic /></div>
+            <div className="mt-4"><ReculverTowersGraphic /></div>
+            <div style={{ background: INK_SOFT, borderRadius: 16, border: `1px solid ${LIME_DEEP}` }} className="mt-4 p-4"><LoopGraphic /></div>
             <div className="grid grid-cols-2 gap-3 mt-4 text-left">
               <div style={{ background: CREAM, borderRadius: 12 }} className="p-3">
                 <span className="text-xs font-bold uppercase opacity-60">Meet</span>
@@ -500,7 +569,7 @@ export default function BuzzEvent({ onExit, ruck500Name = "" }) {
             <h2 className="display" style={{ fontSize: "2.3rem", color: LIME }}>ARE YOU BACK AT MINNIS BAY?</h2>
             <p className="opacity-70 mt-3">{doneCount} / {EVENT.checkpoints.length} checkpoints stamped.</p>
             {!allDone && <p className="text-sm mt-3" style={{ color: "#ff775f" }}>You can finish early, but your certificate will show that not all checkpoints were stamped.</p>}
-            <button onClick={doFinish} className="w-full py-4 rounded-full font-bold mt-6" style={{ background: LIME, color: INK }}>CONFIRM FINISH</button>
+            <button onClick={doFinish} className="w-full py-4 rounded-full font-bold mt-6" style={{ background: LIME, color: INK, minHeight: 52, marginBottom: "max(1rem, env(safe-area-inset-bottom))" }}>CONFIRM FINISH</button>
             <button onClick={() => setScreen("hub")} className="w-full py-3 rounded-full font-semibold mt-2 border-2" style={{ borderColor: CREAM }}>NOT YET</button>
           </div>
         </div>
@@ -511,7 +580,7 @@ export default function BuzzEvent({ onExit, ruck500Name = "" }) {
   if (screen === "complete" || screen === "certificate") {
     const total = participant.finishTime && participant.startTime ? participant.finishTime - participant.startTime : 0;
     return (
-      <div style={{ ...shell, background: COFFEE }}>
+      <div style={{ ...shell, background: INK }}>
         {topbar}
         <div className="max-w-md mx-auto w-full px-5 py-7">
           <div className="text-center mb-4">
@@ -520,11 +589,11 @@ export default function BuzzEvent({ onExit, ruck500Name = "" }) {
             <p className="text-sm opacity-75">{EVENT.route}</p>
           </div>
 
-          <div className="rounded-2xl p-5 text-center" style={{ background: CREAM, color: INK, border: `5px double ${COFFEE}` }}>
+          <div className="rounded-2xl p-5 text-center" style={{ background: CREAM, color: INK, border: `5px double ${INK}` }}>
             <p className="text-xs font-bold tracking-[0.18em] opacity-60">CERTIFICATE OF COMPLETION</p>
             <p className="font-bold mt-2">RUCK BUZZ</p>
-            <h2 className="display mt-3" style={{ fontSize: "2.2rem", color: COFFEE }}>{displayName()}</h2>
-            <p className="text-sm">has completed the {EVENT.distanceKm}km ruck{allDone ? ", all checkpoints stamped" : ""}.</p>
+            <h2 className="display mt-3" style={{ fontSize: "2.2rem", color: INK }}>{displayName()}</h2>
+            <p className="text-sm">has completed the {EVENT.distanceMiles} mile ruck{allDone ? ", all checkpoints stamped" : ""}.</p>
             <div className="grid grid-cols-2 gap-3 mt-4 text-sm">
               <div><span className="block text-xs uppercase opacity-50">Date</span>{fmtDate(participant.finishTime)}</div>
               <div><span className="block text-xs uppercase opacity-50">Total time</span>{fmtElapsed(total)}</div>
@@ -549,6 +618,9 @@ export default function BuzzEvent({ onExit, ruck500Name = "" }) {
 
           <button onClick={downloadCertificate} className="w-full py-4 rounded-full font-bold mt-4" style={{ background: LIME, color: INK }}>SAVE / SHARE CERTIFICATE</button>
           <button onClick={onExit} className="w-full py-3 rounded-full font-semibold mt-2 border-2" style={{ borderColor: CREAM }}>BACK TO RUCK 500</button>
+          <button onClick={resetEvent} className="w-full mt-4 text-xs underline opacity-55 py-2" style={{ color: CREAM, background: "transparent" }}>
+            Reset this Buzz Ruck
+          </button>
         </div>
       </div>
     );
@@ -596,10 +668,28 @@ export default function BuzzEvent({ onExit, ruck500Name = "" }) {
           })}
         </div>
 
-        <button onClick={() => setScreen("finish")} className="w-full py-4 rounded-full font-bold text-lg mt-2" style={{ background: allDone ? LIME : "transparent", color: allDone ? INK : CREAM, border: allDone ? "none" : `2px solid ${CREAM}` }}>
-          I'M BACK — FINISH RUCK
+        <div
+          className="sticky bottom-0 -mx-5 px-5 pt-3 mt-2"
+          style={{
+            background: INK,
+            paddingBottom: "max(1rem, env(safe-area-inset-bottom))",
+            borderTop: "1px solid #262626",
+            zIndex: 6,
+          }}
+        >
+          <button
+            onClick={() => setScreen("finish")}
+            className="w-full py-4 rounded-full font-bold text-lg"
+            style={{ background: allDone ? LIME : "transparent", color: allDone ? INK : CREAM, border: allDone ? "none" : `2px solid ${CREAM}`, minHeight: 52 }}
+          >
+            I'M BACK — FINISH RUCK
+          </button>
+          {!allDone && <p className="text-center text-xs opacity-50 mt-2">You can finish early, but all four photos are needed for a fully stamped certificate.</p>}
+        </div>
+
+        <button onClick={resetEvent} className="w-full mt-4 text-xs underline opacity-45 py-2" style={{ color: CREAM, background: "transparent" }}>
+          Reset this Buzz Ruck
         </button>
-        {!allDone && <p className="text-center text-xs opacity-50 mt-2">You can finish early, but all four photos are needed for a fully stamped certificate.</p>}
       </div>
 
       {toast && <div className="fixed bottom-5 left-1/2 -translate-x-1/2 px-4 py-2 rounded-full font-semibold text-sm z-[100]" style={{ background: LIME, color: INK, whiteSpace: "nowrap", maxWidth: "calc(100vw - 32px)" }}>{toast}</div>}
