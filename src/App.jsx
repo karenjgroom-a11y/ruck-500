@@ -38,7 +38,7 @@ const MONTH_NAMES = [
 
 // One "Ruck to the Buzz" Saturday per month — 10km, alternating Sandwich <-> Deal
 const EVENTS = [
-  { month: 0, day: 9,  name: "New Year Buzz Ruck",     from: "Minnis Bay", to: "Reculver", scene: "bay", drink: "cocoa", photo: EVENT_PHOTO_1, distanceKm: 12, loop: true, integrated: true },
+  { month: 0, day: 9,  name: "New Year Buzz Ruck",     from: "Minnis Bay", to: "Reculver", scene: "bay", drink: "cocoa", photo: "/reculver-towers-sunset.jpg", distanceMiles: 7.5, loop: true, integrated: true },
   { month: 1, day: 13, name: "Frosty Flask Ruck",       from: "Deal",     to: "Sandwich", scene: "pier", drink: "cocoa",  photo: EVENT_PHOTO_2 },
   { month: 2, day: 13, name: "Spring Awakening Ruck",   from: "Sandwich", to: "Deal",     scene: "bay",  drink: "coffee", photo: EVENT_PHOTO_5 },
   { month: 3, day: 10, name: "Blossom Buzz Ruck",       from: "Deal",     to: "Sandwich", scene: "pier", drink: "coffee", photo: EVENT_PHOTO_4 },
@@ -1294,37 +1294,23 @@ export default function RuckChallenge() {
                   <span style={{ color: LIME }} className="text-xs font-bold uppercase tracking-wide">
                     {MONTH_NAMES[e.month]} {e.day}
                   </span>
-                  <span className="text-stone-400 text-xs">{e.integrated ? "7.5 MI" : (e.distanceKm ? `${e.distanceKm}K` : "10K")}</span>
+                  <span className="text-stone-400 text-xs">{e.integrated ? `${e.distanceMiles} MI` : "10K"}</span>
                 </div>
                 <span className="text-white font-semibold" style={{ fontSize: "1.05rem" }}>{e.name}</span>
                 {e.loop ? (
                   <>
-                    <div className="flex justify-center mt-1" aria-hidden="true">
-                      <svg viewBox="0 0 180 110" width="92" height="56" style={{ display: "block" }}>
-                        <path d="M28 94 L28 39 L47 39 L47 24 L64 24 L64 94 Z M116 94 L116 24 L133 24 L133 39 L152 39 L152 94 Z M64 94 L64 48 L74 48 L74 38 L106 38 L106 48 L116 48 L116 94 Z" fill={LIME} />
-                        <path d="M38 94 V56 H54 V94 Z M126 94 V56 H142 V94 Z M78 94 V64 Q90 49 102 64 V94 Z" fill={INK} />
-                        <path d="M18 96 H162" stroke={LIME} strokeWidth="4" strokeLinecap="round" />
-                      </svg>
-                    </div>
-                    <div
-                    className="mt-1 rounded-lg px-2 py-2"
+<div
+                    className="mt-1 rounded-lg px-2 py-1"
                     style={{ border: `1px solid ${CHARCOAL}`, background: "#111" }}
                     aria-label={`${e.distanceKm} kilometre loop from ${e.from} to ${e.to} and back`}
                   >
-                    <svg viewBox="0 0 340 90" width="100%" role="img" aria-hidden="true" style={{ display: "block", maxWidth: "100%" }}>
-                      <defs>
-                        <marker id="buzz-loop-arrow" markerWidth="7" markerHeight="7" refX="5.5" refY="3.5" orient="auto">
-                          <path d="M0,0 L7,3.5 L0,7 Z" fill={LIME} />
-                        </marker>
-                      </defs>
-                      <path d="M96 27 C136 7 204 7 244 27" fill="none" stroke={LIME} strokeWidth="3.5" strokeLinecap="round" markerEnd="url(#buzz-loop-arrow)" />
-                      <path d="M244 63 C204 83 136 83 96 63" fill="none" stroke={LIME} strokeWidth="3.5" strokeLinecap="round" markerEnd="url(#buzz-loop-arrow)" />
-                      <circle cx="88" cy="45" r="7" fill={LIME} />
-                      <circle cx="252" cy="45" r="7" fill={LIME} />
-                      <text x="8" y="49" fill="#D8D8D2" fontSize="11.5" fontWeight="700">MINNIS BAY</text>
-                      <text x="265" y="49" fill="#D8D8D2" fontSize="11.5" fontWeight="700">RECULVER</text>
-                      <text x="170" y="40" fill="white" fontSize="18" fontWeight="800" textAnchor="middle">7.5 MI</text>
-                      <text x="170" y="57" fill="#BDBDB8" fontSize="10" fontWeight="700" textAnchor="middle">LOOP</text>
+                    <svg viewBox="0 0 340 72" width="100%" role="img" aria-label="Minnis Bay to Reculver, 7.5 mile loop" style={{ display: "block", maxWidth: "100%" }}>
+                      <text x="12" y="42" fill="#D8D8D2" fontSize="12" fontWeight="700">MINNIS BAY</text>
+                      <circle cx="105" cy="36" r="7" fill={LIME} />
+                      <text x="170" y="31" fill="white" fontSize="18" fontWeight="800" textAnchor="middle">7.5 MI</text>
+                      <text x="170" y="49" fill="#BDBDB8" fontSize="10" fontWeight="700" textAnchor="middle">LOOP</text>
+                      <circle cx="235" cy="36" r="7" fill={LIME} />
+                      <text x="250" y="42" fill="#D8D8D2" fontSize="12" fontWeight="700">RECULVER</text>
                     </svg>
                   </div>
                   </>

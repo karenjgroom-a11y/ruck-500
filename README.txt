@@ -1,3 +1,17 @@
+RUCK 500 — VERSION 1.9.1 FINAL
+
+Targeted January card / entry-flow refinement:
+- January card now uses the approved Reculver Towers sunset photo.
+- Removed the small illustrated Towers icon.
+- Simplified the route graphic to Minnis Bay • 7.5 MI LOOP • Reculver.
+- Removed route arrows to reduce card depth.
+- Removed the Buzz event sign-up page.
+- The existing Ruck 500 name now carries directly into the Buzz event.
+- Event flow is now: Reveal/Continue → Welcome → Start Ruck.
+- All visible January event distance references are in miles, not kilometres.
+- V1.9 reset, private photo storage, mobile width lock, safe-area buttons,
+  Pandolf calories, milestones, streaks and all main Ruck 500 behaviour are preserved.
+
 RUCK 500 — VERSION 1.9 FINAL
 
 Combined January Buzz polish + reset update:

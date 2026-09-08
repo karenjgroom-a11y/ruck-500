@@ -13,7 +13,6 @@ const EVENT = {
   id: "jan2027",
   name: "New Year Buzz Ruck",
   route: "Minnis Bay → Reculver → Minnis Bay",
-  distanceKm: 12,
   distanceMiles: 7.5,
   dateStr: "9 January 2027",
   meetPoint: "Minnis Bay Car Park",
@@ -150,35 +149,15 @@ function fmtElapsed(ms) {
 }
 
 
-function ReculverTowersGraphic({ compact = false }) {
-  const w = compact ? 110 : 170;
-  const h = compact ? 66 : 102;
-  return (
-    <svg viewBox="0 0 180 110" width={w} height={h} role="img" aria-label="Stylised Reculver Towers" style={{ display: "block", maxWidth: "100%", margin: "0 auto" }}>
-      <path d="M28 94 L28 39 L47 39 L47 24 L64 24 L64 94 Z M116 94 L116 24 L133 24 L133 39 L152 39 L152 94 Z M64 94 L64 48 L74 48 L74 38 L106 38 L106 48 L116 48 L116 94 Z" fill={LIME} />
-      <path d="M38 94 V56 H54 V94 Z M126 94 V56 H142 V94 Z M78 94 V64 Q90 49 102 64 V94 Z" fill={INK} opacity="0.96" />
-      <rect x="83" y="47" width="14" height="9" rx="1" fill={INK} opacity="0.96" />
-      <path d="M18 96 H162" stroke={LIME} strokeWidth="4" strokeLinecap="round" />
-    </svg>
-  );
-}
-
 function LoopGraphic() {
   return (
-    <svg viewBox="0 0 360 118" width="100%" role="img" aria-label="7.5 mile loop from Minnis Bay to Reculver and back" style={{ display: "block", maxWidth: "100%" }}>
-      <defs>
-        <marker id="event-loop-arrow" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
-          <path d="M0,0 L8,4 L0,8 Z" fill={LIME} />
-        </marker>
-      </defs>
-      <path d="M108 34 C148 8 212 8 252 34" fill="none" stroke={LIME} strokeWidth="4" strokeLinecap="round" markerEnd="url(#event-loop-arrow)" />
-      <path d="M252 82 C212 108 148 108 108 82" fill="none" stroke={LIME} strokeWidth="4" strokeLinecap="round" markerEnd="url(#event-loop-arrow)" />
-      <circle cx="98" cy="58" r="9" fill={LIME} />
-      <circle cx="262" cy="58" r="9" fill={LIME} />
-      <text x="8" y="62" fill={CREAM} fontSize="12" fontWeight="700">MINNIS BAY</text>
-      <text x="278" y="62" fill={CREAM} fontSize="12" fontWeight="700">RECULVER</text>
-      <text x="180" y="54" fill="white" fontSize="22" fontWeight="800" textAnchor="middle">7.5 MI</text>
-      <text x="180" y="74" fill="#BDBDB8" fontSize="11" fontWeight="700" textAnchor="middle">LOOP</text>
+    <svg viewBox="0 0 360 76" width="100%" role="img" aria-label="Minnis Bay to Reculver, 7.5 mile loop" style={{ display: "block", maxWidth: "100%" }}>
+      <text x="10" y="45" fill={CREAM} fontSize="12" fontWeight="700">MINNIS BAY</text>
+      <circle cx="112" cy="38" r="8" fill={LIME} />
+      <text x="180" y="33" fill="white" fontSize="22" fontWeight="800" textAnchor="middle">7.5 MI</text>
+      <text x="180" y="54" fill="#BDBDB8" fontSize="11" fontWeight="700" textAnchor="middle">LOOP</text>
+      <circle cx="248" cy="38" r="8" fill={LIME} />
+      <text x="263" y="45" fill={CREAM} fontSize="12" fontWeight="700">RECULVER</text>
     </svg>
   );
 }
@@ -191,9 +170,6 @@ export default function BuzzEvent({ onExit, ruck500Name = "" }) {
   const [pendingPhoto, setPendingPhoto] = useState(null);
   const [toast, setToast] = useState("");
   const [now, setNow] = useState(Date.now());
-  const [firstName, setFirstName] = useState(participant.firstName || "");
-  const [surname, setSurname] = useState(participant.surname || "");
-  const [nickname, setNickname] = useState(participant.nickname || "");
   const toastTimer = useRef(null);
 
   function showToast(msg) {
@@ -258,18 +234,6 @@ export default function BuzzEvent({ onExit, ruck500Name = "" }) {
     return prevDone ? "active" : "todo";
   }
 
-  function doRegister() {
-    const first = firstName.trim();
-    const last = surname.trim();
-    if (!first || !last) {
-      showToast("Add your first name and surname");
-      return;
-    }
-    const next = { ...participant, firstName: first, surname: last, nickname: nickname.trim() };
-    persistParticipant(next);
-    setScreen("welcome");
-  }
-
   function doStart() {
     const next = { ...participant, startTime: Date.now(), finishTime: null };
     persistParticipant(next);
@@ -329,9 +293,6 @@ export default function BuzzEvent({ onExit, ruck500Name = "" }) {
 
     const fresh = blankParticipant(ruck500Name);
     setParticipant(fresh);
-    setFirstName(fresh.firstName || "");
-    setSurname(fresh.surname || "");
-    setNickname("");
     setPhotos({});
     setPendingPhoto(null);
     setActiveCpId(null);
@@ -456,8 +417,10 @@ export default function BuzzEvent({ onExit, ruck500Name = "" }) {
             <span className="inline-block border-2 rounded-full px-4 py-1.5 text-xs font-bold tracking-widest mb-5" style={{ borderColor: INK }}>ONE-DAY EVENT</span>
             <h1 className="display" style={{ fontSize: "3.5rem", lineHeight: 0.9 }}>NEW YEAR<br />BUZZ RUCK</h1>
             <p className="font-bold mt-4">9 January 2027 · Minnis Bay</p>
-            <div className="mt-4"><ReculverTowersGraphic /></div>
-            <div style={{ background: INK_SOFT, borderRadius: 16, border: `1px solid ${LIME_DEEP}` }} className="mt-4 p-4"><LoopGraphic /></div>
+            <div className="mt-5 rounded-2xl overflow-hidden" style={{ border: `2px solid ${INK}` }}>
+              <img src="/reculver-towers-sunset.jpg" alt="Reculver Towers at sunset" style={{ width: "100%", height: 150, objectFit: "cover", display: "block" }} />
+            </div>
+            <div style={{ background: INK_SOFT, borderRadius: 16, border: `1px solid ${LIME_DEEP}` }} className="mt-4 p-3"><LoopGraphic /></div>
             <div className="grid grid-cols-2 gap-3 mt-4 text-left">
               <div style={{ background: CREAM, borderRadius: 12 }} className="p-3">
                 <span className="text-xs font-bold uppercase opacity-60">Meet</span>
@@ -473,34 +436,19 @@ export default function BuzzEvent({ onExit, ruck500Name = "" }) {
         <section className="px-5 py-8">
           <div className="max-w-md mx-auto">
             <p className="text-center text-sm opacity-70 mb-5">Photo checkpoints. No GPS. No fuss.</p>
-            <button onClick={() => setScreen("register")} className="w-full py-4 rounded-full font-bold text-lg" style={{ background: LIME, color: INK }}>
-              JOIN THE RUCK
+            <button
+              onClick={() => {
+                const fresh = { ...participant, ...blankParticipant(ruck500Name), nickname: participant.nickname || "" };
+                persistParticipant(fresh);
+                setScreen("welcome");
+              }}
+              className="w-full py-4 rounded-full font-bold text-lg"
+              style={{ background: LIME, color: INK }}
+            >
+              CONTINUE
             </button>
           </div>
         </section>
-      </div>
-    );
-  }
-
-  if (screen === "register") {
-    return (
-      <div style={{ ...shell, background: CREAM, color: INK }}>
-        {topbar}
-        <div className="max-w-md mx-auto w-full px-5 py-8">
-          <button onClick={() => setScreen("landing")} className="text-sm underline mb-5">← Back</button>
-          <h2 className="display" style={{ fontSize: "2.4rem" }}>SIGN UP</h2>
-          <p className="text-sm opacity-65 mb-5">Just the basics. Stored only on this phone.</p>
-          <label className="text-xs font-bold uppercase tracking-wide">First name
-            <input value={firstName} onChange={(e) => setFirstName(e.target.value)} className="mt-1 mb-3 w-full border-2 rounded-xl px-3 py-3 text-base font-normal" style={{ borderColor: KHAKI, background: "white" }} />
-          </label>
-          <label className="text-xs font-bold uppercase tracking-wide">Surname
-            <input value={surname} onChange={(e) => setSurname(e.target.value)} className="mt-1 mb-3 w-full border-2 rounded-xl px-3 py-3 text-base font-normal" style={{ borderColor: KHAKI, background: "white" }} />
-          </label>
-          <label className="text-xs font-bold uppercase tracking-wide">Nickname / ruck name (optional)
-            <input value={nickname} onChange={(e) => setNickname(e.target.value)} className="mt-1 mb-5 w-full border-2 rounded-xl px-3 py-3 text-base font-normal" style={{ borderColor: KHAKI, background: "white" }} />
-          </label>
-          <button onClick={doRegister} className="w-full py-4 rounded-full font-bold text-lg" style={{ background: INK, color: LIME }}>CONTINUE</button>
-        </div>
       </div>
     );
   }
