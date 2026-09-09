@@ -1,3 +1,13 @@
+RUCK 500 — VERSION 1.10.3 FINAL
+
+Home-screen icon correction:
+- Rebuilt the RUCK 500 icon from scratch on a true edge-to-edge black square.
+- Removed the baked-in white rim/background completely.
+- No rounded corners are baked into the image; iOS applies its own app-icon mask.
+- Retained the chunky lime RUCK 500 wordmark.
+- New v5 icon filenames force a fresh iPhone/Safari fetch.
+- All V1.10.2 app/event functionality is unchanged.
+
 RUCK 500 — VERSION 1.10.2 FINAL
 
 Home-screen icon refinement only:
