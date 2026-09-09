@@ -1,3 +1,12 @@
+RUCK 500 — VERSION 1.10.2 FINAL
+
+Home-screen icon refinement only:
+- Removed the Buzz/van illustration from the app icon.
+- Replaced it with the approved chunky RUCK 500 wordmark on black.
+- New icon filenames (v4) force iPhone/Safari to request fresh assets rather than reuse the cached previous icon.
+- Updated Apple touch icon, PWA manifest icons and favicon.
+- February V1.10.1 fixes and all other app behaviour are unchanged.
+
 RUCK 500 — VERSION 1.10.1 FINAL
 
 Tiny corrective patch:
