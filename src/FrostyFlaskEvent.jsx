@@ -360,7 +360,7 @@ export default function FrostyFlaskEvent({ onExit, ruck500Name = "" }) {
     }
 
     ctx.font = "14px Arial"; ctx.fillStyle = KHAKI;
-    ctx.fillText("MINNIS BAY  →  RECULVER  →  MINNIS BAY", W / 2, H - 50);
+    ctx.fillText(EVENT.route.toUpperCase(), W / 2, H - 50);
 
     canvas.toBlob(async (blob) => {
       if (!blob) return;
@@ -519,7 +519,7 @@ export default function FrostyFlaskEvent({ onExit, ruck500Name = "" }) {
         <div className="min-h-[calc(100dvh-52px)] flex items-center">
           <div className="max-w-md mx-auto w-full px-5 py-8 text-center">
             <Flag size={44} className="mx-auto mb-3" color={LIME} />
-            <h2 className="display" style={{ fontSize: "2.3rem", color: LIME }}>ARE YOU BACK AT MINNIS BAY?</h2>
+            <h2 className="display" style={{ fontSize: "2.3rem", color: LIME }}>ARE YOU BACK AT SANDWICH QUAYSIDE?</h2>
             <p className="opacity-70 mt-3">{doneCount} / {EVENT.checkpoints.length} checkpoints stamped.</p>
             {!allDone && <p className="text-sm mt-3" style={{ color: "#ff775f" }}>You can finish early, but your certificate will show that not all checkpoints were stamped.</p>}
             <button onClick={doFinish} className="w-full py-4 rounded-full font-bold mt-6" style={{ background: LIME, color: INK, minHeight: 52, marginBottom: "max(1rem, env(safe-area-inset-bottom))" }}>CONFIRM FINISH</button>
@@ -592,7 +592,7 @@ export default function FrostyFlaskEvent({ onExit, ruck500Name = "" }) {
         <div>
           <div className="flex gap-3 pb-5">
             <div className="w-12 h-12 rounded-full flex items-center justify-center shrink-0" style={{ background: LIME, color: INK }}><Flag size={20} /></div>
-            <div className="pt-1"><p className="font-bold text-lg">START — MINNIS BAY</p><p className="text-xs" style={{ color: LIME }}>{fmtTime(participant.startTime)}</p></div>
+            <div className="pt-1"><p className="font-bold text-lg">START — SANDWICH QUAYSIDE</p><p className="text-xs" style={{ color: LIME }}>{fmtTime(participant.startTime)}</p></div>
           </div>
 
           {EVENT.checkpoints.map((cp, idx) => {

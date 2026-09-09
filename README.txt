@@ -1,3 +1,13 @@
+RUCK 500 — VERSION 1.10.1 FINAL
+
+Tiny corrective patch:
+- February finish confirmation now says "Are you back at Sandwich Quayside?"
+- February start marker now says "START — SANDWICH QUAYSIDE".
+- February downloadable certificate now uses the February EVENT route rather than a leftover January route string.
+- Home-screen/PWA icon filenames have been versioned to force iPhone/Safari to refetch the new Ruck 500 / Buzz icon.
+- Manifest, Apple touch icon and favicon references updated.
+- Everything else from V1.10 is unchanged.
+
 RUCK 500 — VERSION 1.10 FINAL
 
 February Frosty Flask Buzz Ruck integration + home-screen icon refinement.
