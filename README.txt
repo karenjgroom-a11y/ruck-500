@@ -1,3 +1,25 @@
+RUCK 500 — VERSION 1.10 FINAL
+
+February Frosty Flask Buzz Ruck integration + home-screen icon refinement.
+
+February:
+- 13 February 2027 Frosty Flask Ruck integrated inside Ruck 500.
+- 12.5 miles, shown as a LOOP.
+- Main route label simplified to SANDWICH → DEAL.
+- Welcome copy: Start when you're ready at Sandwich Quayside Car Park.
+- Reuses the same approved Coffee Buzz welcome graphic as January.
+- Four February checkpoints from Neil's supplied event.
+- Separate local event state and IndexedDB photo keys from January.
+- Reset-for-testing affects February only.
+- Buzz Ruck certificate wording retained.
+
+Ruck 500:
+- January behaviour preserved.
+- Both Jan 9 and Feb 13 calendar dates reveal their correct Buzz Ruck.
+- Event cards use the same neat loop format.
+- Added proper PWA/home-screen icons: dark background, lime Buzz silhouette and RUCK 500 branding.
+- Added manifest, Apple touch icon and favicon.
+
 RUCK 500 — VERSION 1.9.2 FINAL
 
 Tiny welcome/certificate correction only:

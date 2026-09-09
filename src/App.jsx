@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo, useRef } from "react";
 import BuzzEvent from "./BuzzEvent.jsx";
+import FrostyFlaskEvent from "./FrostyFlaskEvent.jsx";
 import { Coffee, MapPin, Footprints, Flame, Dumbbell, X, Check, Heart, Mountain, ChevronRight, Backpack, Leaf, Trophy, Repeat, Award, Maximize2 } from "lucide-react";
 
 // ---------- Brand tokens ----------
@@ -38,8 +39,8 @@ const MONTH_NAMES = [
 
 // One "Ruck to the Buzz" Saturday per month — 10km, alternating Sandwich <-> Deal
 const EVENTS = [
-  { month: 0, day: 9,  name: "New Year Buzz Ruck",     from: "Minnis Bay", to: "Reculver", scene: "bay", drink: "cocoa", photo: "/reculver-towers-sunset.jpg", distanceMiles: 7.5, loop: true, integrated: true },
-  { month: 1, day: 13, name: "Frosty Flask Ruck",       from: "Deal",     to: "Sandwich", scene: "pier", drink: "cocoa",  photo: EVENT_PHOTO_2 },
+  { month: 0, day: 9,  name: "New Year Buzz Ruck",     from: "Minnis Bay", to: "Reculver", scene: "bay", drink: "cocoa", photo: "/reculver-towers-sunset.jpg", distanceMiles: 7.5, loop: true, integrated: true, eventId: "jan2027" },
+  { month: 1, day: 13, name: "Frosty Flask Ruck",       from: "Sandwich", to: "Deal", scene: "pier", drink: "cocoa", photo: EVENT_PHOTO_2, distanceMiles: 12.5, loop: true, integrated: true, eventId: "feb2027" },
   { month: 2, day: 13, name: "Spring Awakening Ruck",   from: "Sandwich", to: "Deal",     scene: "bay",  drink: "coffee", photo: EVENT_PHOTO_5 },
   { month: 3, day: 10, name: "Blossom Buzz Ruck",       from: "Deal",     to: "Sandwich", scene: "pier", drink: "coffee", photo: EVENT_PHOTO_4 },
   { month: 4, day: 8,  name: "May Meadows Ruck",        from: "Sandwich", to: "Deal",     scene: "bay",  drink: "coffee", photo: EVENT_PHOTO_6 },
@@ -402,6 +403,7 @@ export default function RuckChallenge() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [eventDetail, setEventDetail] = useState(null); // the EVENTS entry currently open
   const [buzzEventOpen, setBuzzEventOpen] = useState(false);
+  const [activeBuzzEventId, setActiveBuzzEventId] = useState("jan2027");
   const [buzzReturnTo, setBuzzReturnTo] = useState(null); // { type: "home" } or { type: "calendar", m, d }
   const logsRef = useRef(logs);
   const restoreInputRef = useRef(null);
@@ -587,14 +589,16 @@ export default function RuckChallenge() {
       : currentCalorieBodyWeightKg;
   const liveCalories = estimateCalories(liveMiles, liveWeight, liveCalorieBodyWeightKg);
 
-  function openBuzzEventFromHome() {
+  function openBuzzEventFromHome(eventId = "jan2027") {
     setEventDetail(null);
+    setActiveBuzzEventId(eventId);
     setBuzzReturnTo({ type: "home" });
     setBuzzEventOpen(true);
   }
 
   function openBuzzEventFromCalendar(m, d) {
     setActiveDate(null);
+    setActiveBuzzEventId(m === 1 && d === 13 ? "feb2027" : "jan2027");
     setBuzzReturnTo({ type: "calendar", m, d });
     setBuzzEventOpen(true);
   }
@@ -1282,7 +1286,7 @@ export default function RuckChallenge() {
           {EVENTS.map((e, i) => (
             <button
               key={i}
-              onClick={() => e.integrated ? openBuzzEventFromHome() : setEventDetail(e)}
+              onClick={() => e.integrated ? openBuzzEventFromHome(e.eventId) : setEventDetail(e)}
               style={{ background: INK, borderRadius: 10, border: `2px dashed ${LIME_DARK}`, overflow: "hidden", textAlign: "left", padding: 0 }}
               className="flex flex-col gap-2 hover:opacity-90 transition"
             >
@@ -1302,15 +1306,15 @@ export default function RuckChallenge() {
 <div
                     className="mt-1 rounded-lg px-2 py-1"
                     style={{ border: `1px solid ${CHARCOAL}`, background: "#111" }}
-                    aria-label={`${e.distanceKm} kilometre loop from ${e.from} to ${e.to} and back`}
+                    aria-label={`${e.from} to ${e.to}, ${e.distanceMiles} mile loop`}
                   >
-                    <svg viewBox="0 0 340 72" width="100%" role="img" aria-label="Minnis Bay to Reculver, 7.5 mile loop" style={{ display: "block", maxWidth: "100%" }}>
-                      <text x="12" y="42" fill="#D8D8D2" fontSize="12" fontWeight="700">MINNIS BAY</text>
+                    <svg viewBox="0 0 340 72" width="100%" role="img" aria-label={`${e.from} to ${e.to}, ${e.distanceMiles} mile loop`} style={{ display: "block", maxWidth: "100%" }}>
+                      <text x="12" y="42" fill="#D8D8D2" fontSize="12" fontWeight="700">{e.from.toUpperCase()}</text>
                       <circle cx="105" cy="36" r="7" fill={LIME} />
-                      <text x="170" y="31" fill="white" fontSize="18" fontWeight="800" textAnchor="middle">7.5 MI</text>
+                      <text x="170" y="31" fill="white" fontSize="18" fontWeight="800" textAnchor="middle">{e.distanceMiles} MI</text>
                       <text x="170" y="49" fill="#BDBDB8" fontSize="10" fontWeight="700" textAnchor="middle">LOOP</text>
                       <circle cx="235" cy="36" r="7" fill={LIME} />
-                      <text x="250" y="42" fill="#D8D8D2" fontSize="12" fontWeight="700">RECULVER</text>
+                      <text x="250" y="42" fill="#D8D8D2" fontSize="12" fontWeight="700">{e.to.toUpperCase()}</text>
                     </svg>
                   </div>
                   </>
@@ -1499,7 +1503,7 @@ export default function RuckChallenge() {
               </div>
             )}
 
-            {activeDate.m === 0 && activeDate.d === 9 && (
+            {((activeDate.m === 0 && activeDate.d === 9) || (activeDate.m === 1 && activeDate.d === 13)) && (
               <button
                 onClick={() => openBuzzEventFromCalendar(activeDate.m, activeDate.d)}
                 style={{ background: INK, color: LIME, borderRadius: 10, border: `2px solid ${LIME_DARK}` }}
@@ -1813,11 +1817,19 @@ export default function RuckChallenge() {
         </div>
       )}
       {buzzEventOpen && (
-        <BuzzEvent
-          onExit={closeBuzzEvent}
-          eventId="jan2027"
-          ruck500Name={name}
-        />
+        activeBuzzEventId === "feb2027" ? (
+          <FrostyFlaskEvent
+            onExit={closeBuzzEvent}
+            eventId="feb2027"
+            ruck500Name={name}
+          />
+        ) : (
+          <BuzzEvent
+            onExit={closeBuzzEvent}
+            eventId="jan2027"
+            ruck500Name={name}
+          />
+        )
       )}
     </div>
   );
