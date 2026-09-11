@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo, useRef } from "react";
 import BuzzEvent from "./BuzzEvent.jsx";
 import FrostyFlaskEvent from "./FrostyFlaskEvent.jsx";
+import SpringAwakeningEvent from "./SpringAwakeningEvent.jsx";
 import { Coffee, MapPin, Footprints, Flame, Dumbbell, X, Check, Heart, Mountain, ChevronRight, Backpack, Leaf, Trophy, Repeat, Award, Maximize2 } from "lucide-react";
 
 // ---------- Brand tokens ----------
@@ -37,11 +38,11 @@ const MONTH_NAMES = [
   "July","August","September","October","November","December"
 ];
 
-// One "Ruck to the Buzz" Saturday per month — 10km, alternating Sandwich <-> Deal
+// One "Ruck to the Buzz" event per month — individual route, distance and event details
 const EVENTS = [
   { month: 0, day: 9,  name: "New Year Buzz Ruck",     from: "Minnis Bay", to: "Reculver", scene: "bay", drink: "cocoa", photo: "/reculver-towers-sunset.jpg", distanceMiles: 7.5, loop: true, integrated: true, eventId: "jan2027" },
   { month: 1, day: 13, name: "Frosty Flask Ruck",       from: "Sandwich", to: "Deal", scene: "pier", drink: "cocoa", photo: EVENT_PHOTO_2, distanceMiles: 12.5, loop: true, integrated: true, eventId: "feb2027" },
-  { month: 2, day: 13, name: "Spring Awakening Ruck",   from: "Sandwich", to: "Deal",     scene: "bay",  drink: "coffee", photo: EVENT_PHOTO_5 },
+  { month: 2, day: 13, name: "Spring Awakening Ruck",   from: "Cliffsend", to: "Ramsgate", scene: "bay", drink: "coffee", photo: "/spring-awakening-event.jpg", distanceMiles: 7.5, loop: true, integrated: true, eventId: "mar2027" },
   { month: 3, day: 10, name: "Blossom Buzz Ruck",       from: "Deal",     to: "Sandwich", scene: "pier", drink: "coffee", photo: EVENT_PHOTO_4 },
   { month: 4, day: 8,  name: "May Meadows Ruck",        from: "Sandwich", to: "Deal",     scene: "bay",  drink: "coffee", photo: EVENT_PHOTO_6 },
   { month: 5, day: 12, name: "Solstice Sunrise Ruck",   from: "Deal",     to: "Sandwich", scene: "pier", drink: "coffee", photo: EVENT_PHOTO_7 },
@@ -598,7 +599,7 @@ export default function RuckChallenge() {
 
   function openBuzzEventFromCalendar(m, d) {
     setActiveDate(null);
-    setActiveBuzzEventId(m === 1 && d === 13 ? "feb2027" : "jan2027");
+    setActiveBuzzEventId(eventFor(m, d)?.eventId || "jan2027");
     setBuzzReturnTo({ type: "calendar", m, d });
     setBuzzEventOpen(true);
   }
@@ -1503,7 +1504,7 @@ export default function RuckChallenge() {
               </div>
             )}
 
-            {((activeDate.m === 0 && activeDate.d === 9) || (activeDate.m === 1 && activeDate.d === 13)) && (
+            {eventFor(activeDate.m, activeDate.d)?.integrated && (
               <button
                 onClick={() => openBuzzEventFromCalendar(activeDate.m, activeDate.d)}
                 style={{ background: INK, color: LIME, borderRadius: 10, border: `2px solid ${LIME_DARK}` }}
@@ -1817,7 +1818,13 @@ export default function RuckChallenge() {
         </div>
       )}
       {buzzEventOpen && (
-        activeBuzzEventId === "feb2027" ? (
+        activeBuzzEventId === "mar2027" ? (
+          <SpringAwakeningEvent
+            onExit={closeBuzzEvent}
+            eventId="mar2027"
+            ruck500Name={name}
+          />
+        ) : activeBuzzEventId === "feb2027" ? (
           <FrostyFlaskEvent
             onExit={closeBuzzEvent}
             eventId="feb2027"

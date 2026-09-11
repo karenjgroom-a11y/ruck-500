@@ -1,3 +1,28 @@
+RUCK 500 — VERSION 1.11.0 FINAL
+
+March Buzz Ruck integration:
+- Added Spring Awakening Ruck as the third fully integrated Buzz Ruck event.
+- Date: 13 March 2027.
+- Start time: 1:00 PM.
+- Start/finish point: The Viking Ship, Cliffsend.
+- Route display: Cliffsend → Ramsgate.
+- Distance: 7.5 miles.
+- Loop event.
+- Four sequential photo checkpoints:
+  1. The Viking Ship, Cliffsend
+  2. Pegwell Bay Country Park
+  3. Ramsgate Tunnels
+  4. Ramsgate Royal Harbour
+- Finish confirmation: “Are you back at The Viking Ship?”
+- Uses the established January/February local-only architecture:
+  localStorage for event progress/times and IndexedDB for checkpoint photos.
+- No sign-up form, admin dashboard, participant list, CSV export, shared storage or completion code.
+- Existing Ruck 500 name carries into the event.
+- March event can be opened from its homepage event card and from 13 March in the calendar.
+- Reset clears only March event progress/photos and does not touch the main Ruck 500 log.
+- Buzz Ruck certificate uses 7.5 miles and the March route.
+- January, February, main Ruck 500 behaviour and V1.10.3 icon fix are otherwise unchanged.
+
 RUCK 500 — VERSION 1.10.3 FINAL
 
 Home-screen icon correction:
