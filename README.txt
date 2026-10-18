@@ -1,3 +1,14 @@
+RUCK 500 — VERSION 1.12.0 APRIL INTEGRATION TEST BUILD
+
+April Buzz Ruck added to homepage and April 10 calendar entry (calendar date is provisional; Neil did not confirm event date).
+April event details: 12 km (~7.5 miles), Sandwich Quayside loop, four checkpoints exactly as supplied.
+Meeting time remains TBC.
+April is based on March established localStorage + IndexedDB architecture with separate apr2027 keys.
+No shared storage, registration, admin, passcode or CSV.
+April event card temporarily reuses the March image as a placeholder; replace when approved April photo is available.
+The April date in the calendar is provisional and should be confirmed before publishing.
+Test photo flow and certificate on a phone before publishing live.
+
 RUCK 500 — VERSION 1.11.0 FINAL
 
 March Buzz Ruck integration:
