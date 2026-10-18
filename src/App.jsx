@@ -4,6 +4,11 @@ import FrostyFlaskEvent from "./FrostyFlaskEvent.jsx";
 import SpringAwakeningEvent from "./SpringAwakeningEvent.jsx";
 import AprilBuzzEvent from "./AprilBuzzEvent.jsx";
 import MayBuzzEvent from "./MayBuzzEvent.jsx";
+import NovemberBuzzEvent from "./NovemberBuzzEvent.jsx";
+import OctoberBuzzEvent from "./OctoberBuzzEvent.jsx";
+import SeptemberBuzzEvent from "./SeptemberBuzzEvent.jsx";
+import AugustBuzzEvent from "./AugustBuzzEvent.jsx";
+import JulyBuzzEvent from "./JulyBuzzEvent.jsx";
 import { Coffee, MapPin, Footprints, Flame, Dumbbell, X, Check, Heart, Mountain, ChevronRight, Backpack, Leaf, Trophy, Repeat, Award, Maximize2 } from "lucide-react";
 
 // ---------- Brand tokens ----------
@@ -48,11 +53,11 @@ const EVENTS = [
   { month: 3, day: 10, name: "Blossom Buzz Ruck",       from: "Sandwich", to: "Prince's", scene: "bay", drink: "coffee", photo: "/april-buzz-event.jpg", distanceMiles: 7.5, loop: true, integrated: true, eventId: "apr2027" },
   { month: 4, day: 8,  name: "May Meadows Ruck",        from: "St Margaret’s Bay", to: "Dover", scene: "bay", drink: "coffee", photo: EVENT_PHOTO_6, distanceMiles: 9.5, loop: true, integrated: true, eventId: "may2027" },
   { month: 5, day: 12, name: "Solstice Sunrise Ruck",   from: "Deal",     to: "Sandwich", scene: "pier", drink: "coffee", photo: EVENT_PHOTO_7 },
-  { month: 6, day: 10, name: "Midsummer Buzz Ruck",     from: "Sandwich", to: "Deal",     scene: "bay",  drink: "coffee", photo: EVENT_PHOTO_6 },
-  { month: 7, day: 14, name: "Dog Days Ruck",           from: "Deal",     to: "Sandwich", scene: "pier", drink: "coffee", photo: EVENT_PHOTO_7 },
-  { month: 8, day: 11, name: "Harvest Ruck",            from: "Sandwich", to: "Deal",     scene: "bay",  drink: "coffee", photo: EVENT_PHOTO_3 },
-  { month: 9, day: 9,  name: "Falling Leaves Ruck",     from: "Deal",     to: "Sandwich", scene: "pier", drink: "coffee", photo: EVENT_PHOTO_3 },
-  { month: 10, day: 13, name: "Frosty Fields Ruck",     from: "Sandwich", to: "Deal",     scene: "bay",  drink: "cocoa",  photo: EVENT_PHOTO_5 },
+  { month: 6, day: 10, name: "Midsummer Buzz Ruck",     from: "Minnis Bay", to: "Reculver",     scene: "bay",  drink: "coffee", photo: "/reculver-towers-sunset.jpg", distanceMiles: 7.5, loop: true, integrated: true, eventId: "jul2027" },
+  { month: 7, day: 14, name: "Dog Days Ruck",           from: "Sandwich",     to: "Deal", scene: "pier", drink: "coffee", photo: EVENT_PHOTO_2, distanceMiles: 12.5, loop: true, integrated: true, eventId: "aug2027" },
+  { month: 8, day: 11, name: "Harvest Ruck",            from: "Cliffsend", to: "Ramsgate",     scene: "bay",  drink: "coffee", photo: "/spring-awakening-event.jpg", distanceMiles: 7.5, loop: true, integrated: true, eventId: "sep2027" },
+  { month: 9, day: 9,  name: "Falling Leaves Ruck",     from: "Sandwich",     to: "Prince's", scene: "pier", drink: "coffee", photo: "/april-buzz-event.jpg", distanceMiles: 7.5, loop: true, integrated: true, eventId: "oct2027" },
+  { month: 10, day: 13, name: "Frosty Fields Ruck",     from: "St Margaret’s Bay", to: "Dover",     scene: "bay",  drink: "cocoa",  photo: EVENT_PHOTO_6, distanceMiles: 9.5, loop: true, integrated: true, eventId: "nov2027" },
   { month: 11, day: 11, name: "Festive Buzz Ruck",      from: "Deal",     to: "Sandwich", scene: "pier", drink: "cocoa",  photo: EVENT_PHOTO_1 },
 ];
 
@@ -1312,7 +1317,7 @@ export default function RuckChallenge() {
                     aria-label={`${e.from} to ${e.to}, ${e.distanceMiles} mile loop`}
                   >
                     <svg viewBox="0 0 340 72" width="100%" role="img" aria-label={`${e.from} to ${e.to}, ${e.distanceMiles} mile loop`} style={{ display: "block", maxWidth: "100%" }}>
-                      {e.eventId === "may2027" ? (
+                      {(e.eventId === "may2027" || e.eventId === "nov2027") ? (
                         <text x="57" y="31" fill="#D8D8D2" fontSize="11" fontWeight="700" textAnchor="middle">
                           <tspan x="57" dy="0">ST MARGARET'S</tspan>
                           <tspan x="57" dy="15">BAY</tspan>
@@ -1320,7 +1325,7 @@ export default function RuckChallenge() {
                       ) : (
                         <text x="12" y="42" fill="#D8D8D2" fontSize="12" fontWeight="700">{e.from.toUpperCase()}</text>
                       )}
-                      <circle cx={e.eventId === "may2027" ? "121" : "105"} cy="36" r="7" fill={LIME} />
+                      <circle cx={(e.eventId === "may2027" || e.eventId === "nov2027") ? "121" : "105"} cy="36" r="7" fill={LIME} />
                       <text x="170" y="31" fill="white" fontSize="18" fontWeight="800" textAnchor="middle">{e.distanceMiles} MI</text>
                       <text x="170" y="49" fill="#BDBDB8" fontSize="10" fontWeight="700" textAnchor="middle">LOOP</text>
                       <circle cx="235" cy="36" r="7" fill={LIME} />
@@ -1827,7 +1832,37 @@ export default function RuckChallenge() {
         </div>
       )}
       {buzzEventOpen && (
-        activeBuzzEventId === "may2027" ? (
+        activeBuzzEventId === "jul2027" ? (
+          <JulyBuzzEvent
+            onExit={closeBuzzEvent}
+            eventId="jul2027"
+            ruck500Name={name}
+          />
+        ) :         activeBuzzEventId === "aug2027" ? (
+          <AugustBuzzEvent
+            onExit={closeBuzzEvent}
+            eventId="aug2027"
+            ruck500Name={name}
+          />
+        ) :         activeBuzzEventId === "sep2027" ? (
+          <SeptemberBuzzEvent
+            onExit={closeBuzzEvent}
+            eventId="sep2027"
+            ruck500Name={name}
+          />
+        ) :         activeBuzzEventId === "oct2027" ? (
+          <OctoberBuzzEvent
+            onExit={closeBuzzEvent}
+            eventId="oct2027"
+            ruck500Name={name}
+          />
+        ) :         activeBuzzEventId === "nov2027" ? (
+          <NovemberBuzzEvent
+            onExit={closeBuzzEvent}
+            eventId="nov2027"
+            ruck500Name={name}
+          />
+        ) :         activeBuzzEventId === "may2027" ? (
           <MayBuzzEvent
             onExit={closeBuzzEvent}
             eventId="may2027"
