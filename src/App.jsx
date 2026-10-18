@@ -46,7 +46,7 @@ const EVENTS = [
   { month: 1, day: 13, name: "Frosty Flask Ruck",       from: "Sandwich", to: "Deal", scene: "pier", drink: "cocoa", photo: EVENT_PHOTO_2, distanceMiles: 12.5, loop: true, integrated: true, eventId: "feb2027" },
   { month: 2, day: 13, name: "Spring Awakening Ruck",   from: "Cliffsend", to: "Ramsgate", scene: "bay", drink: "coffee", photo: "/spring-awakening-event.jpg", distanceMiles: 7.5, loop: true, integrated: true, eventId: "mar2027" },
   { month: 3, day: 10, name: "Blossom Buzz Ruck",       from: "Sandwich", to: "Prince's", scene: "bay", drink: "coffee", photo: "/april-buzz-event.jpg", distanceMiles: 7.5, loop: true, integrated: true, eventId: "apr2027" },
-  { month: 4, day: 8,  name: "May Meadows Ruck",        from: "St Margaret’s Bay", to: "Dover", scene: "bay", drink: "coffee", photo: EVENT_PHOTO_6, distanceMiles: 9.3, loop: true, integrated: true, eventId: "may2027" },
+  { month: 4, day: 8,  name: "May Meadows Ruck",        from: "St Margaret’s Bay", to: "Dover", scene: "bay", drink: "coffee", photo: EVENT_PHOTO_6, distanceMiles: 9.5, loop: true, integrated: true, eventId: "may2027" },
   { month: 5, day: 12, name: "Solstice Sunrise Ruck",   from: "Deal",     to: "Sandwich", scene: "pier", drink: "coffee", photo: EVENT_PHOTO_7 },
   { month: 6, day: 10, name: "Midsummer Buzz Ruck",     from: "Sandwich", to: "Deal",     scene: "bay",  drink: "coffee", photo: EVENT_PHOTO_6 },
   { month: 7, day: 14, name: "Dog Days Ruck",           from: "Deal",     to: "Sandwich", scene: "pier", drink: "coffee", photo: EVENT_PHOTO_7 },
@@ -1312,8 +1312,15 @@ export default function RuckChallenge() {
                     aria-label={`${e.from} to ${e.to}, ${e.distanceMiles} mile loop`}
                   >
                     <svg viewBox="0 0 340 72" width="100%" role="img" aria-label={`${e.from} to ${e.to}, ${e.distanceMiles} mile loop`} style={{ display: "block", maxWidth: "100%" }}>
-                      <text x="12" y="42" fill="#D8D8D2" fontSize="12" fontWeight="700">{e.from.toUpperCase()}</text>
-                      <circle cx="105" cy="36" r="7" fill={LIME} />
+                      {e.eventId === "may2027" ? (
+                        <text x="57" y="31" fill="#D8D8D2" fontSize="11" fontWeight="700" textAnchor="middle">
+                          <tspan x="57" dy="0">ST MARGARET'S</tspan>
+                          <tspan x="57" dy="15">BAY</tspan>
+                        </text>
+                      ) : (
+                        <text x="12" y="42" fill="#D8D8D2" fontSize="12" fontWeight="700">{e.from.toUpperCase()}</text>
+                      )}
+                      <circle cx={e.eventId === "may2027" ? "121" : "105"} cy="36" r="7" fill={LIME} />
                       <text x="170" y="31" fill="white" fontSize="18" fontWeight="800" textAnchor="middle">{e.distanceMiles} MI</text>
                       <text x="170" y="49" fill="#BDBDB8" fontSize="10" fontWeight="700" textAnchor="middle">LOOP</text>
                       <circle cx="235" cy="36" r="7" fill={LIME} />
