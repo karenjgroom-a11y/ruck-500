@@ -162,7 +162,7 @@ function LoopGraphic() {
   );
 }
 
-export default function SpringAwakeningEvent({ onExit, ruck500Name = "" }) {
+export default function SeptemberBuzzEvent({ onExit, ruck500Name = "" }) {
   const [participant, setParticipant] = useState(() => loadMeta(ruck500Name));
   const [screen, setScreen] = useState("loading");
   const [activeCpId, setActiveCpId] = useState(null);
@@ -322,7 +322,7 @@ export default function SpringAwakeningEvent({ onExit, ruck500Name = "" }) {
     ctx.font = "700 42px Arial";
     ctx.fillText(EVENT.name.toUpperCase(), W / 2, 177);
     ctx.font = "16px Arial";
-    ctx.fillText(EVENT.route, W / 2, 208);
+    ctx.fillText(EVENT.route, W / 2, 208, W - 140);
     ctx.font = "700 52px Arial";
     ctx.fillText(displayName(), W / 2, 285);
     ctx.font = "16px Arial";
@@ -360,7 +360,7 @@ export default function SpringAwakeningEvent({ onExit, ruck500Name = "" }) {
     }
 
     ctx.font = "14px Arial"; ctx.fillStyle = KHAKI;
-    ctx.fillText(EVENT.route.toUpperCase(), W / 2, H - 50);
+    ctx.fillText(EVENT.route.toUpperCase(), W / 2, H - 50, W - 140);
 
     canvas.toBlob(async (blob) => {
       if (!blob) return;

@@ -162,7 +162,7 @@ function LoopGraphic() {
   );
 }
 
-export default function AprilBuzzEvent({ onExit, ruck500Name = "" }) {
+export default function OctoberBuzzEvent({ onExit, ruck500Name = "" }) {
   const [participant, setParticipant] = useState(() => loadMeta(ruck500Name));
   const [screen, setScreen] = useState("loading");
   const [activeCpId, setActiveCpId] = useState(null);
@@ -322,7 +322,7 @@ export default function AprilBuzzEvent({ onExit, ruck500Name = "" }) {
     ctx.font = "700 42px Arial";
     ctx.fillText("FALLING LEAVES RUCK", W / 2, 177);
     ctx.font = "16px Arial";
-    ctx.fillText(EVENT.route, W / 2, 208);
+    ctx.fillText(EVENT.route, W / 2, 208, W - 140);
     ctx.font = "700 52px Arial";
     ctx.fillText(displayName(), W / 2, 285);
     ctx.font = "16px Arial";
@@ -360,7 +360,7 @@ export default function AprilBuzzEvent({ onExit, ruck500Name = "" }) {
     }
 
     ctx.font = "14px Arial"; ctx.fillStyle = KHAKI;
-    ctx.fillText(EVENT.route.toUpperCase(), W / 2, H - 50);
+    ctx.fillText(EVENT.route.toUpperCase(), W / 2, H - 50, W - 140);
 
     canvas.toBlob(async (blob) => {
       if (!blob) return;
@@ -519,7 +519,7 @@ export default function AprilBuzzEvent({ onExit, ruck500Name = "" }) {
         <div className="min-h-[calc(100dvh-52px)] flex items-center">
           <div className="max-w-md mx-auto w-full px-5 py-8 text-center">
             <Flag size={44} className="mx-auto mb-3" color={LIME} />
-            <h2 className="display" style={{ fontSize: "2.3rem", color: LIME }}>ARE YOU BACK AT THE VIKING SHIP?</h2>
+            <h2 className="display" style={{ fontSize: "2.3rem", color: LIME }}>ARE YOU BACK AT SANDWICH QUAYSIDE?</h2>
             <p className="opacity-70 mt-3">{doneCount} / {EVENT.checkpoints.length} checkpoints stamped.</p>
             {!allDone && <p className="text-sm mt-3" style={{ color: "#ff775f" }}>You can finish early, but your certificate will show that not all checkpoints were stamped.</p>}
             <button onClick={doFinish} className="w-full py-4 rounded-full font-bold mt-6" style={{ background: LIME, color: INK, minHeight: 52, marginBottom: "max(1rem, env(safe-area-inset-bottom))" }}>CONFIRM FINISH</button>
