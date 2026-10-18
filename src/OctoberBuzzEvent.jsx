@@ -280,7 +280,7 @@ export default function AprilBuzzEvent({ onExit, ruck500Name = "" }) {
 
   async function resetEvent() {
     const ok = confirm(
-      "Reset this Buzz Ruck? This removes your Blossom Buzz Ruck progress, checkpoint photos, start/finish times and certificate from this device. Your main Ruck 500 log will not be affected."
+      "Reset this Buzz Ruck? This removes your Falling Leaves Ruck progress, checkpoint photos, start/finish times and certificate from this device. Your main Ruck 500 log will not be affected."
     );
     if (!ok) return;
 
@@ -298,7 +298,7 @@ export default function AprilBuzzEvent({ onExit, ruck500Name = "" }) {
     setActiveCpId(null);
     setNow(Date.now());
     setScreen("landing");
-    showToast("Blossom Buzz Ruck reset.");
+    showToast("Falling Leaves Ruck reset.");
   }
 
   function doFinish() {
@@ -320,7 +320,7 @@ export default function AprilBuzzEvent({ onExit, ruck500Name = "" }) {
     ctx.font = "300 20px Georgia, serif";
     ctx.fillText("C E R T I F I C A T E   O F   C O M P L E T I O N", W / 2, 120);
     ctx.font = "700 42px Arial";
-    ctx.fillText("BLOSSOM BUZZ RUCK", W / 2, 177);
+    ctx.fillText("FALLING LEAVES RUCK", W / 2, 177);
     ctx.font = "16px Arial";
     ctx.fillText(EVENT.route, W / 2, 208);
     ctx.font = "700 52px Arial";
@@ -400,7 +400,7 @@ export default function AprilBuzzEvent({ onExit, ruck500Name = "" }) {
       <button onClick={onExit} className="flex items-center gap-1 text-sm font-semibold" style={{ color: LIME, background: "none" }}>
         <ArrowLeft size={17} /> Ruck 500
       </button>
-      <span className="font-bold uppercase tracking-wide text-xs" style={{ color: "#c8c8c2" }}>Blossom Buzz Ruck</span>
+      <span className="font-bold uppercase tracking-wide text-xs" style={{ color: "#c8c8c2" }}>{EVENT.name}</span>
     </div>
   );
 
@@ -415,10 +415,10 @@ export default function AprilBuzzEvent({ onExit, ruck500Name = "" }) {
         <section style={{ background: LIME, color: INK }} className="px-5 pt-8 pb-7">
           <div className="max-w-md mx-auto text-center">
             <span className="inline-block border-2 rounded-full px-4 py-1.5 text-xs font-bold tracking-widest mb-5" style={{ borderColor: INK }}>ONE-DAY EVENT</span>
-            <h1 className="display" style={{ fontSize: "3.5rem", lineHeight: 0.9 }}>BLOSSOM<br />BUZZ RUCK</h1>
-            <p className="font-bold mt-4">Saturday 10 April 2027 · Sandwich Quayside</p>
+            <h1 className="display" style={{ fontSize: "3.5rem", lineHeight: 0.9 }}>FALLING LEAVES<br />RUCK</h1>
+            <p className="font-bold mt-4">9 October 2027 · Sandwich Quayside</p>
             <div className="mt-5 rounded-2xl overflow-hidden" style={{ border: `2px solid ${INK}` }}>
-              <img src="/april-buzz-event.jpg" alt="Blossom Buzz Ruck route" style={{ width: "100%", height: 150, objectFit: "cover", display: "block" }} />
+              <img src="/april-buzz-event.jpg" alt="Falling Leaves Ruck route" style={{ width: "100%", height: 150, objectFit: "cover", display: "block" }} />
             </div>
             <div style={{ background: INK_SOFT, borderRadius: 16, border: `1px solid ${LIME_DEEP}` }} className="mt-4 p-3"><LoopGraphic /></div>
             <div className="grid grid-cols-2 gap-3 mt-4 text-left">

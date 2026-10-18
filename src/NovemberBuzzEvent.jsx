@@ -13,7 +13,7 @@ const EVENT = {
   id: "nov2027",
   name: "Frosty Fields Ruck",
   route: "St Margaret's Bay → South Foreland Lighthouse → Fan Bay & Langdon Cliffs → White Cliffs Visitor Centre → Dover Seafront → St Margaret's Bay",
-  distanceMiles: 9.3,
+  distanceMiles: 9.5,
   dateStr: "13 November 2027",
   meetPoint: "St Margaret's Bay Car Park, CT15 6DU",
   meetTime: "1:00 PM",
@@ -151,10 +151,10 @@ function fmtElapsed(ms) {
 
 function LoopGraphic() {
   return (
-    <svg viewBox="0 0 360 76" width="100%" role="img" aria-label="St Margaret’s Bay to Dover, 9.3 mile loop" style={{ display: "block", maxWidth: "100%" }}>
+    <svg viewBox="0 0 360 76" width="100%" role="img" aria-label="St Margaret’s Bay to Dover, 9.5 mile loop" style={{ display: "block", maxWidth: "100%" }}>
       <text x="28" y="45" fill={CREAM} fontSize="13" fontWeight="700">ST MARGARET’S</text>
       <circle cx="112" cy="38" r="8" fill={LIME} />
-      <text x="180" y="33" fill="white" fontSize="22" fontWeight="800" textAnchor="middle">9.3 MI</text>
+      <text x="180" y="33" fill="white" fontSize="22" fontWeight="800" textAnchor="middle">9.5 MI</text>
       <text x="180" y="54" fill="#BDBDB8" fontSize="11" fontWeight="700" textAnchor="middle">LOOP</text>
       <circle cx="248" cy="38" r="8" fill={LIME} />
       <text x="270" y="45" fill={CREAM} fontSize="13" fontWeight="700">DOVER</text>
@@ -280,7 +280,7 @@ export default function MayBuzzEvent({ onExit, ruck500Name = "" }) {
 
   async function resetEvent() {
     const ok = confirm(
-      "Reset this Buzz Ruck? This removes your May Meadows Ruck progress, checkpoint photos, start/finish times and certificate from this device. Your main Ruck 500 log will not be affected."
+      "Reset this Buzz Ruck? This removes your Frosty Fields Ruck progress, checkpoint photos, start/finish times and certificate from this device. Your main Ruck 500 log will not be affected."
     );
     if (!ok) return;
 
@@ -298,7 +298,7 @@ export default function MayBuzzEvent({ onExit, ruck500Name = "" }) {
     setActiveCpId(null);
     setNow(Date.now());
     setScreen("landing");
-    showToast("May Meadows Ruck reset.");
+    showToast("Frosty Fields Ruck reset.");
   }
 
   function doFinish() {
@@ -320,7 +320,7 @@ export default function MayBuzzEvent({ onExit, ruck500Name = "" }) {
     ctx.font = "300 20px Georgia, serif";
     ctx.fillText("C E R T I F I C A T E   O F   C O M P L E T I O N", W / 2, 120);
     ctx.font = "700 42px Arial";
-    ctx.fillText("MAY MEADOWS RUCK", W / 2, 177);
+    ctx.fillText("FROSTY FIELDS RUCK", W / 2, 177);
     ctx.font = "16px Arial";
     ctx.fillText(EVENT.route, W / 2, 208);
     ctx.font = "700 52px Arial";
@@ -400,7 +400,7 @@ export default function MayBuzzEvent({ onExit, ruck500Name = "" }) {
       <button onClick={onExit} className="flex items-center gap-1 text-sm font-semibold" style={{ color: LIME, background: "none" }}>
         <ArrowLeft size={17} /> Ruck 500
       </button>
-      <span className="font-bold uppercase tracking-wide text-xs" style={{ color: "#c8c8c2" }}>May Meadows Ruck</span>
+      <span className="font-bold uppercase tracking-wide text-xs" style={{ color: "#c8c8c2" }}>{EVENT.name}</span>
     </div>
   );
 
@@ -415,8 +415,8 @@ export default function MayBuzzEvent({ onExit, ruck500Name = "" }) {
         <section style={{ background: LIME, color: INK }} className="px-5 pt-8 pb-7">
           <div className="max-w-md mx-auto text-center">
             <span className="inline-block border-2 rounded-full px-4 py-1.5 text-xs font-bold tracking-widest mb-5" style={{ borderColor: INK }}>ONE-DAY EVENT</span>
-            <h1 className="display" style={{ fontSize: "3.5rem", lineHeight: 0.9 }}>MAY MEADOWS<br />RUCK</h1>
-            <p className="font-bold mt-4">Saturday 8 May 2027 · St Margaret's Bay</p>
+            <h1 className="display" style={{ fontSize: "3.5rem", lineHeight: 0.9 }}>FROSTY FIELDS<br />RUCK</h1>
+            <p className="font-bold mt-4">13 November 2027 · St Margaret's Bay</p>
             <div style={{ background: INK_SOFT, borderRadius: 16, border: `1px solid ${LIME_DEEP}` }} className="mt-4 p-3"><LoopGraphic /></div>
             
             <div className="grid grid-cols-2 gap-3 mt-4 text-left">
