@@ -1,12 +1,20 @@
+RUCK 500 — VERSION 1.12.2 BLOSSOM BUZZ RUCK FINAL
+
+April Blossom Buzz Ruck: Saturday 10 April 2027, 1:00 PM, meeting at Sandwich Quayside Car Park.
+Welcome screen, route graphic (SANDWICH — 7.5 MI LOOP — PRINCE'S), event heading and certificate updated.
+The April 10 calendar Reveal the Buzz Ruck link and all four existing checkpoints remain unchanged.
+This release does not change January–March events or saved progress storage keys.
+
+--- PREVIOUS RELEASE NOTES ---
 RUCK 500 — VERSION 1.12.0 APRIL INTEGRATION TEST BUILD
 
-April Buzz Ruck added to homepage and April 10 calendar entry (calendar date is provisional; Neil did not confirm event date).
+April Buzz Ruck added to homepage and April 10 calendar entry (date subsequently confirmed in V1.12.2).
 April event details: 12 km (~7.5 miles), Sandwich Quayside loop, four checkpoints exactly as supplied.
-Meeting time remains TBC.
+Meeting time confirmed as 1:00 PM in V1.12.2.
 April is based on March established localStorage + IndexedDB architecture with separate apr2027 keys.
 No shared storage, registration, admin, passcode or CSV.
 April event card temporarily reuses the March image as a placeholder; replace when approved April photo is available.
-The April date in the calendar is provisional and should be confirmed before publishing.
+April date confirmed in V1.12.2.
 Test photo flow and certificate on a phone before publishing live.
 
 RUCK 500 — VERSION 1.11.0 FINAL

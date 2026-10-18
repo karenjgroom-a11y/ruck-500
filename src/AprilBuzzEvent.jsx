@@ -14,9 +14,9 @@ const EVENT = {
   name: "Blossom Buzz Ruck",
   route: "Sandwich Quayside → River Mouth Beach → Saxon Shore Way → Prince's Golf Club → Sandwich Quayside",
   distanceMiles: 7.5,
-  dateStr: "April 2027 (date TBC)",
+  dateStr: "Saturday 10 April 2027",
   meetPoint: "Sandwich Quayside Car Park",
-  meetTime: "Time TBC",
+  meetTime: "1:00 PM",
   checkpoints: [
     { id: "cp1", name: "THE RIVER MOUTH BEACH", desc: "First stamp — where the Stour meets the sea.", instructions: "Get the crew together on the beach before heading onto the trail.", emoji: "🏖️" },
     { id: "cp2", name: "SAXON SHORE WAY", desc: "The old coastal trail marker.", instructions: "Quick group photo at the trail sign, then push on toward the golf links.", emoji: "🥾" },
@@ -151,13 +151,13 @@ function fmtElapsed(ms) {
 
 function LoopGraphic() {
   return (
-    <svg viewBox="0 0 360 76" width="100%" role="img" aria-label="Sandwich Quayside, 7.5 mile loop" style={{ display: "block", maxWidth: "100%" }}>
+    <svg viewBox="0 0 360 76" width="100%" role="img" aria-label="Sandwich to Prince's, 7.5 mile loop" style={{ display: "block", maxWidth: "100%" }}>
       <text x="28" y="45" fill={CREAM} fontSize="13" fontWeight="700">SANDWICH</text>
       <circle cx="112" cy="38" r="8" fill={LIME} />
       <text x="180" y="33" fill="white" fontSize="22" fontWeight="800" textAnchor="middle">7.5 MI</text>
       <text x="180" y="54" fill="#BDBDB8" fontSize="11" fontWeight="700" textAnchor="middle">LOOP</text>
       <circle cx="248" cy="38" r="8" fill={LIME} />
-      <text x="270" y="45" fill={CREAM} fontSize="13" fontWeight="700">QUAYSIDE</text>
+      <text x="270" y="45" fill={CREAM} fontSize="13" fontWeight="700">PRINCE'S</text>
     </svg>
   );
 }
@@ -280,7 +280,7 @@ export default function AprilBuzzEvent({ onExit, ruck500Name = "" }) {
 
   async function resetEvent() {
     const ok = confirm(
-      "Reset this Buzz Ruck? This removes your April Buzz Ruck progress, checkpoint photos, start/finish times and certificate from this device. Your main Ruck 500 log will not be affected."
+      "Reset this Buzz Ruck? This removes your Blossom Buzz Ruck progress, checkpoint photos, start/finish times and certificate from this device. Your main Ruck 500 log will not be affected."
     );
     if (!ok) return;
 
@@ -298,7 +298,7 @@ export default function AprilBuzzEvent({ onExit, ruck500Name = "" }) {
     setActiveCpId(null);
     setNow(Date.now());
     setScreen("landing");
-    showToast("April Buzz Ruck reset.");
+    showToast("Blossom Buzz Ruck reset.");
   }
 
   function doFinish() {
@@ -320,7 +320,7 @@ export default function AprilBuzzEvent({ onExit, ruck500Name = "" }) {
     ctx.font = "300 20px Georgia, serif";
     ctx.fillText("C E R T I F I C A T E   O F   C O M P L E T I O N", W / 2, 120);
     ctx.font = "700 42px Arial";
-    ctx.fillText("BUZZ RUCK", W / 2, 177);
+    ctx.fillText("BLOSSOM BUZZ RUCK", W / 2, 177);
     ctx.font = "16px Arial";
     ctx.fillText(EVENT.route, W / 2, 208);
     ctx.font = "700 52px Arial";
@@ -400,7 +400,7 @@ export default function AprilBuzzEvent({ onExit, ruck500Name = "" }) {
       <button onClick={onExit} className="flex items-center gap-1 text-sm font-semibold" style={{ color: LIME, background: "none" }}>
         <ArrowLeft size={17} /> Ruck 500
       </button>
-      <span className="font-bold uppercase tracking-wide text-xs" style={{ color: "#c8c8c2" }}>April Buzz Ruck</span>
+      <span className="font-bold uppercase tracking-wide text-xs" style={{ color: "#c8c8c2" }}>Blossom Buzz Ruck</span>
     </div>
   );
 
@@ -415,10 +415,10 @@ export default function AprilBuzzEvent({ onExit, ruck500Name = "" }) {
         <section style={{ background: LIME, color: INK }} className="px-5 pt-8 pb-7">
           <div className="max-w-md mx-auto text-center">
             <span className="inline-block border-2 rounded-full px-4 py-1.5 text-xs font-bold tracking-widest mb-5" style={{ borderColor: INK }}>ONE-DAY EVENT</span>
-            <h1 className="display" style={{ fontSize: "3.5rem", lineHeight: 0.9 }}>APRIL<br />BUZZ RUCK</h1>
-            <p className="font-bold mt-4">April 2027 (date TBC) · Sandwich Quayside</p>
+            <h1 className="display" style={{ fontSize: "3.5rem", lineHeight: 0.9 }}>BLOSSOM<br />BUZZ RUCK</h1>
+            <p className="font-bold mt-4">Saturday 10 April 2027 · Sandwich Quayside</p>
             <div className="mt-5 rounded-2xl overflow-hidden" style={{ border: `2px solid ${INK}` }}>
-              <img src="/april-buzz-event.jpg" alt="April Buzz Ruck route" style={{ width: "100%", height: 150, objectFit: "cover", display: "block" }} />
+              <img src="/april-buzz-event.jpg" alt="Blossom Buzz Ruck route" style={{ width: "100%", height: 150, objectFit: "cover", display: "block" }} />
             </div>
             <div style={{ background: INK_SOFT, borderRadius: 16, border: `1px solid ${LIME_DEEP}` }} className="mt-4 p-3"><LoopGraphic /></div>
             <div className="grid grid-cols-2 gap-3 mt-4 text-left">
