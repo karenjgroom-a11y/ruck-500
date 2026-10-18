@@ -3,6 +3,7 @@ import BuzzEvent from "./BuzzEvent.jsx";
 import FrostyFlaskEvent from "./FrostyFlaskEvent.jsx";
 import SpringAwakeningEvent from "./SpringAwakeningEvent.jsx";
 import AprilBuzzEvent from "./AprilBuzzEvent.jsx";
+import MayBuzzEvent from "./MayBuzzEvent.jsx";
 import { Coffee, MapPin, Footprints, Flame, Dumbbell, X, Check, Heart, Mountain, ChevronRight, Backpack, Leaf, Trophy, Repeat, Award, Maximize2 } from "lucide-react";
 
 // ---------- Brand tokens ----------
@@ -45,7 +46,7 @@ const EVENTS = [
   { month: 1, day: 13, name: "Frosty Flask Ruck",       from: "Sandwich", to: "Deal", scene: "pier", drink: "cocoa", photo: EVENT_PHOTO_2, distanceMiles: 12.5, loop: true, integrated: true, eventId: "feb2027" },
   { month: 2, day: 13, name: "Spring Awakening Ruck",   from: "Cliffsend", to: "Ramsgate", scene: "bay", drink: "coffee", photo: "/spring-awakening-event.jpg", distanceMiles: 7.5, loop: true, integrated: true, eventId: "mar2027" },
   { month: 3, day: 10, name: "Blossom Buzz Ruck",       from: "Sandwich", to: "Prince's", scene: "bay", drink: "coffee", photo: "/april-buzz-event.jpg", distanceMiles: 7.5, loop: true, integrated: true, eventId: "apr2027" },
-  { month: 4, day: 8,  name: "May Meadows Ruck",        from: "Sandwich", to: "Deal",     scene: "bay",  drink: "coffee", photo: EVENT_PHOTO_6 },
+  { month: 4, day: 8,  name: "May Meadows Ruck",        from: "St Margaret’s Bay", to: "Dover", scene: "bay", drink: "coffee", photo: EVENT_PHOTO_6, distanceMiles: 9.3, loop: true, integrated: true, eventId: "may2027" },
   { month: 5, day: 12, name: "Solstice Sunrise Ruck",   from: "Deal",     to: "Sandwich", scene: "pier", drink: "coffee", photo: EVENT_PHOTO_7 },
   { month: 6, day: 10, name: "Midsummer Buzz Ruck",     from: "Sandwich", to: "Deal",     scene: "bay",  drink: "coffee", photo: EVENT_PHOTO_6 },
   { month: 7, day: 14, name: "Dog Days Ruck",           from: "Deal",     to: "Sandwich", scene: "pier", drink: "coffee", photo: EVENT_PHOTO_7 },
@@ -1819,7 +1820,13 @@ export default function RuckChallenge() {
         </div>
       )}
       {buzzEventOpen && (
-        activeBuzzEventId === "apr2027" ? (
+        activeBuzzEventId === "may2027" ? (
+          <MayBuzzEvent
+            onExit={closeBuzzEvent}
+            eventId="may2027"
+            ruck500Name={name}
+          />
+        ) : activeBuzzEventId === "apr2027" ? (
           <AprilBuzzEvent
             onExit={closeBuzzEvent}
             eventId="apr2027"
