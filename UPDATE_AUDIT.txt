@@ -1,0 +1,36 @@
+RUCK 500 — V1.15.0 PRE-RELEASE SOURCE AUDIT — 22 OCTOBER 2026
+
+BASE: V1.14.3 (July–November route and screen fixes).
+STATUS: SOURCE DRAFT ONLY — NOT CLEARED FOR NETLIFY DEPLOYMENT.
+
+CHANGED:
+1. June main event card: Coastal Challenge 2027, 12 June, Reculver photo, 50 KM / 31.1 MI, Reculver Towers → Viking Bay → Kingsdown.
+2. June card and June calendar Reveal the Buzz Ruck both open the same challenge-choice screen.
+3. June choices: Full 50 km (Reculver → Kingsdown) or Half approx. 25 km (Reculver → Viking Bay), both 8 am, 12 June.
+4. Viking Bay identified as the Coffee Buzz halfway hub and half-distance pickup/finish.
+5. Separate localStorage and IndexedDB photo keys for full and half June options.
+6. June progress screens: start point, individual photo checkpoints, finish confirmation, elapsed time, photo certificates.
+7. December: Santa's Festive Fun Ruck, 11 December, 1 pm, Sandwich Quayside loop, 5 km / 3.1 mi, four festive photo checkpoints.
+8. December event card and calendar Reveal the Buzz Ruck wired to December module.
+9. Existing January–May and July–November event components unchanged from V1.14.3.
+10. Existing Ruck 500 mileage localStorage keys, year data and backup functions unchanged.
+
+CHECKS DONE:
+- JSX parsing: App, June choice, June full, June half, December: PASS (TypeScript parser).
+- Existing May component: byte-for-byte unchanged from V1.14.3.
+- New event keys: jun2027-full, jun2027-half, dec2027 (isolated from other months).
+- June source originally contains only 4 checkpoints, ending at Viking Bay; Ramsgate and Kingsdown added as proposed checkpoints for full distance, not sourced from Neil's checkpoint list.
+- Full route distance 50 km and half 25 km remain approximate; no GPS route has been verified.
+
+NOT YET VERIFIED — DO NOT DEPLOY WITHOUT:
+- npm install and vite production build (dependency cache unavailable in this environment).
+- Browser/iPhone functional tests, including return navigation from June choice and calendar.
+- Certificate image layout and saving/sharing on iPhone.
+- Existing on-device data survival after Netlify update.
+- June actual route and checkpoints beyond Viking Bay, and van parking permission.
+- October/November screen visual regression (source retained, not re-tested).
+
+NOTES:
+- The original Neil June/December pasted HTML has missing JS template delimiters; it was not embedded directly. New modules follow the existing Ruck 500 React architecture instead.
+- June full distance is ~31.1 miles, half ~15.5 miles, December ~3.1 miles.
+- This package is a source review candidate, NOT a confirmed production-ready release.

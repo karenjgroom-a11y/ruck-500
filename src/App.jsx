@@ -9,6 +9,8 @@ import OctoberBuzzEvent from "./OctoberBuzzEvent.jsx";
 import SeptemberBuzzEvent from "./SeptemberBuzzEvent.jsx";
 import AugustBuzzEvent from "./AugustBuzzEvent.jsx";
 import JulyBuzzEvent from "./JulyBuzzEvent.jsx";
+import JuneChallengeEvent from "./JuneChallengeEvent.jsx";
+import DecemberBuzzEvent from "./DecemberBuzzEvent.jsx";
 import { Coffee, MapPin, Footprints, Flame, Dumbbell, X, Check, Heart, Mountain, ChevronRight, Backpack, Leaf, Trophy, Repeat, Award, Maximize2 } from "lucide-react";
 
 // ---------- Brand tokens ----------
@@ -52,13 +54,13 @@ const EVENTS = [
   { month: 2, day: 13, name: "Spring Awakening Ruck",   from: "Cliffsend", to: "Ramsgate", scene: "bay", drink: "coffee", photo: "/spring-awakening-event.jpg", distanceMiles: 7.5, loop: true, integrated: true, eventId: "mar2027" },
   { month: 3, day: 10, name: "Blossom Buzz Ruck",       from: "Sandwich", to: "Prince's", scene: "bay", drink: "coffee", photo: "/april-buzz-event.jpg", distanceMiles: 7.5, loop: true, integrated: true, eventId: "apr2027" },
   { month: 4, day: 8,  name: "May Meadows Ruck",        from: "St Margaret’s Bay", to: "Dover", scene: "bay", drink: "coffee", photo: EVENT_PHOTO_6, distanceMiles: 9.5, loop: true, integrated: true, eventId: "may2027" },
-  { month: 5, day: 12, name: "Solstice Sunrise Ruck",   from: "Deal",     to: "Sandwich", scene: "pier", drink: "coffee", photo: EVENT_PHOTO_7 },
+  { month: 5, day: 12, name: "Coastal Challenge 2027", from: "Reculver Towers", to: "Kingsdown", scene: "bay", drink: "coffee", photo: "/reculver-towers-sunset.jpg", distanceMiles: 31.1, distanceKm: 50, integrated: true, eventId: "jun2027" },
   { month: 6, day: 10, name: "Midsummer Buzz Ruck",     from: "Minnis Bay", to: "Reculver",     scene: "bay",  drink: "coffee", photo: "/reculver-towers-sunset.jpg", distanceMiles: 7.5, loop: true, integrated: true, eventId: "jul2027" },
   { month: 7, day: 14, name: "Dog Days Ruck",           from: "Sandwich",     to: "Deal", scene: "pier", drink: "coffee", photo: EVENT_PHOTO_2, distanceMiles: 12.5, loop: true, integrated: true, eventId: "aug2027" },
   { month: 8, day: 11, name: "Harvest Ruck",            from: "Cliffsend", to: "Ramsgate",     scene: "bay",  drink: "coffee", photo: "/spring-awakening-event.jpg", distanceMiles: 7.5, loop: true, integrated: true, eventId: "sep2027" },
   { month: 9, day: 9,  name: "Falling Leaves Ruck",     from: "Sandwich",     to: "Prince's", scene: "pier", drink: "coffee", photo: "/april-buzz-event.jpg", distanceMiles: 7.5, loop: true, integrated: true, eventId: "oct2027" },
   { month: 10, day: 13, name: "Frosty Fields Ruck",     from: "St Margaret’s Bay", to: "Dover",     scene: "bay",  drink: "cocoa",  photo: EVENT_PHOTO_6, distanceMiles: 9.5, loop: true, integrated: true, eventId: "nov2027" },
-  { month: 11, day: 11, name: "Festive Buzz Ruck",      from: "Deal",     to: "Sandwich", scene: "pier", drink: "cocoa",  photo: EVENT_PHOTO_1 },
+  { month: 11, day: 11, name: "Santa’s Festive Fun Ruck", from: "Sandwich Quayside", to: "Sandwich Quayside", scene: "bay", drink: "cocoa", photo: EVENT_PHOTO_1, distanceMiles: 3.1, distanceKm: 5, loop: true, integrated: true, eventId: "dec2027" },
 ];
 
 // Menu at the Coffee Buzz — everything is a £1 donation
@@ -1306,10 +1308,16 @@ export default function RuckChallenge() {
                   <span style={{ color: LIME }} className="text-xs font-bold uppercase tracking-wide">
                     {MONTH_NAMES[e.month]} {e.day}
                   </span>
-                  <span className="text-stone-400 text-xs">{e.integrated ? `${e.distanceMiles} MI` : "10K"}</span>
+                  <span className="text-stone-400 text-xs">{e.distanceKm ? `${e.distanceKm} KM` : e.integrated ? `${e.distanceMiles} MI` : "10K"}</span>
                 </div>
                 <span className="text-white font-semibold" style={{ fontSize: "1.05rem" }}>{e.name}</span>
-                {e.loop ? (
+                {e.eventId === "jun2027" ? (
+                  <div className="rounded-lg p-3" style={{background: "#111", border: `1px solid ${CHARCOAL}`}}>
+                    <div className="text-center font-extrabold" style={{color:LIME, fontSize:22}}>50 KM · 31.1 MI</div>
+                    <div className="text-center text-xs text-stone-300">RECULVER TOWERS → VIKING BAY → KINGSDOWN</div>
+                    <div className="text-center text-xs text-stone-400 mt-1">Choose full or half challenge</div>
+                  </div>
+                ) : e.loop ? (
                   <>
 <div
                     className="mt-1 rounded-lg px-2 py-1"
@@ -1832,7 +1840,11 @@ export default function RuckChallenge() {
         </div>
       )}
       {buzzEventOpen && (
-        activeBuzzEventId === "jul2027" ? (
+        activeBuzzEventId === "jun2027" ? (
+          <JuneChallengeEvent onExit={closeBuzzEvent} ruck500Name={name} />
+        ) : activeBuzzEventId === "dec2027" ? (
+          <DecemberBuzzEvent onExit={closeBuzzEvent} ruck500Name={name} />
+        ) : activeBuzzEventId === "jul2027" ? (
           <JulyBuzzEvent
             onExit={closeBuzzEvent}
             eventId="jul2027"
