@@ -7,16 +7,16 @@
   "theme_color": "#C6E70A",
   "icons": [
     {
-      "src": "/ruck500-wordmark-v5-192.png",
+      "src": "/ruck500-mountain-2027-192.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     },
     {
-      "src": "/ruck500-wordmark-v5-512.png",
+      "src": "/ruck500-mountain-2027-512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     }
   ]
 }

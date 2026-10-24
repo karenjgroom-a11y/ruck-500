@@ -10,13 +10,13 @@ const COFFEE = INK; // visual palette aligned to Ruck 500
 const KHAKI = "#767A54";
 
 const EVENT = {
-  id: "jun2027-half", name: "Coastal Challenge 2027 — Half 25K", route: "Reculver Towers → Minnis Bay → Margate Harbour → Viking Bay, Broadstairs",
-  distanceKm: 25, distanceMiles: 15.5, dateStr: "Saturday 12 June 2027", meetPoint: "Reculver Towers and Country Park, Herne Bay", finishPoint: "Viking Bay, Broadstairs — Coffee Buzz meeting point", meetTime: "8:00 AM",
+  id: "jun2027-half", name: "Coastal Challenge 2027 — Half 20K", route: "Reculver Towers → Minnis Bay → Margate Harbour → King George VI Memorial Park, Ramsgate",
+  distanceKm: 20, distanceMiles: 12.4, dateStr: "Saturday 12 June 2027", meetPoint: "Reculver Towers", finishPoint: "King George VI Memorial Park, Ramsgate — Coffee Buzz stop and 20 km finish", meetTime: "8:00 AM",
   checkpoints: [
     {id:"cp1",name:"RECULVER TOWERS",desc:"Official start-line team photograph.",instructions:"Photograph the team at Reculver Towers before setting off.",emoji:"🏰"},
     {id:"cp2",name:"MINNIS BAY",desc:"Coastal group photo.",instructions:"Capture the group at Minnis Bay.",emoji:"🏖️"},
     {id:"cp3",name:"MARGATE HARBOUR",desc:"Harbour milestone.",instructions:"Capture the group at Margate Harbour.",emoji:"⚓"},
-    {id:"cp4",name:"VIKING BAY — FINISH",desc:"Coffee Buzz and collection point.",instructions:"Photograph your arrival at Viking Bay, Broadstairs.",emoji:"☕"},
+    {id:"cp4",name:"KING GEORGE VI MEMORIAL PARK — FINISH",desc:"Coffee Buzz stop and 20 km finish.",instructions:"Photograph your arrival at King George VI Memorial Park, Ramsgate.",emoji:"☕"},
   ],
 };
 
@@ -270,7 +270,7 @@ export default function JuneHalfEvent({ onExit, ruck500Name = "" }) {
 
   async function resetEvent() {
     const ok = confirm(
-      "Reset this Buzz Ruck? This removes your Coastal Challenge — Half 25K progress, checkpoint photos, start/finish times and certificate from this device. Your main Ruck 500 log will not be affected."
+      "Reset this Buzz Ruck? This removes your Coastal Challenge — Half 20K progress, checkpoint photos, start/finish times and certificate from this device. Your main Ruck 500 log will not be affected."
     );
     if (!ok) return;
 
@@ -288,7 +288,7 @@ export default function JuneHalfEvent({ onExit, ruck500Name = "" }) {
     setActiveCpId(null);
     setNow(Date.now());
     setScreen("landing");
-    showToast("Coastal Challenge — Half 25K reset.");
+    showToast("Coastal Challenge — Half 20K reset.");
   }
 
   function doFinish() {
@@ -390,7 +390,7 @@ export default function JuneHalfEvent({ onExit, ruck500Name = "" }) {
       <button onClick={onExit} className="flex items-center gap-1 text-sm font-semibold" style={{ color: LIME, background: "none" }}>
         <ArrowLeft size={17} /> Ruck 500
       </button>
-      <span className="font-bold uppercase tracking-wide text-xs" style={{ color: "#c8c8c2" }}>Coastal Challenge — Half 25K</span>
+      <span className="font-bold uppercase tracking-wide text-xs" style={{ color: "#c8c8c2" }}>Coastal Challenge — Half 20K</span>
     </div>
   );
 
@@ -625,7 +625,7 @@ export default function JuneHalfEvent({ onExit, ruck500Name = "" }) {
           >
             I'VE ARRIVED — FINISH RUCK
           </button>
-          {!allDone && <p className="text-center text-xs opacity-50 mt-2">You can finish early, but all four photos are needed for a fully stamped certificate.</p>}
+          {!allDone && <p className="text-center text-xs opacity-50 mt-2">You can finish early, but all checkpoint photos are needed for a fully stamped certificate.</p>}
         </div>
 
         <button onClick={resetEvent} className="w-full mt-4 text-xs underline opacity-45 py-2" style={{ color: CREAM, background: "transparent" }}>

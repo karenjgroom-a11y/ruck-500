@@ -10,15 +10,17 @@ const COFFEE = INK; // visual palette aligned to Ruck 500
 const KHAKI = "#767A54";
 
 const EVENT = {
-  id: "jun2027-full", name: "Coastal Challenge 2027 — Full 50K", route: "Reculver Towers → Minnis Bay → Margate Harbour → Viking Bay → Ramsgate → Kingsdown Camping",
-  distanceKm: 50, distanceMiles: 31.1, dateStr: "Saturday 12 June 2027", meetPoint: "Reculver Towers and Country Park, Herne Bay", finishPoint: "Kingsdown Camping, The Avenue, Kingsdown, Deal, CT14 8DU", meetTime: "8:00 AM",
+  id: "jun2027-full", name: "Coastal Challenge 2027 — Full 50K", route: "Reculver Towers → Minnis Bay → Margate Harbour → King George VI Memorial Park → Ramsgate Royal Harbour → Sandwich Quay → Deal Pier → Kingsdown Camping Park",
+  distanceKm: 50, distanceMiles: 31.1, dateStr: "Saturday 12 June 2027", meetPoint: "Reculver Towers", finishPoint: "Kingsdown Camping Park", meetTime: "8:00 AM",
   checkpoints: [
     {id:"cp1",name:"RECULVER TOWERS",desc:"Official start-line team photograph.",instructions:"Photograph the team at Reculver Towers before setting off.",emoji:"🏰"},
     {id:"cp2",name:"MINNIS BAY",desc:"Coastal group photo.",instructions:"Capture the group at Minnis Bay.",emoji:"🏖️"},
     {id:"cp3",name:"MARGATE HARBOUR",desc:"Harbour milestone.",instructions:"Capture the group at Margate Harbour.",emoji:"⚓"},
-    {id:"cp4",name:"VIKING BAY — HALFWAY",desc:"Coffee Buzz and collection point for half-distance walkers.",instructions:"Stamp your halfway photo at Viking Bay, Broadstairs.",emoji:"☕"},
-    {id:"cp5",name:"RAMSGATE ROYAL HARBOUR",desc:"Continue along the coast toward Kingsdown.",instructions:"Photograph the group at Ramsgate Harbour.",emoji:"⛵"},
-    {id:"cp6",name:"KINGSDOWN CAMPING",desc:"Finish-line photograph.",instructions:"Photograph your arrival at Kingsdown Camping.",emoji:"🏁"},
+    {id:"cp4",name:"KING GEORGE VI MEMORIAL PARK — COFFEE BUZZ",desc:"Coffee Buzz stop; 20 km walkers finish here.",instructions:"Photograph the Coffee Buzz stop at King George VI Memorial Park, Ramsgate.",emoji:"☕"},
+    {id:"cp5",name:"RAMSGATE ROYAL HARBOUR",desc:"Continue along the coast.",instructions:"Photograph the group at Ramsgate Royal Harbour.",emoji:"⛵"},
+    {id:"cp6",name:"SANDWICH QUAY",desc:"Sandwich checkpoint.",instructions:"Photograph the group at Sandwich Quay.",emoji:"📸"},
+    {id:"cp7",name:"DEAL PIER",desc:"Deal checkpoint.",instructions:"Photograph the group at Deal Pier.",emoji:"📸"},
+    {id:"cp8",name:"KINGSDOWN CAMPING PARK — FINISH",desc:"50 km finish-line photograph.",instructions:"Photograph your arrival at Kingsdown Camping Park.",emoji:"🏁"},
   ],
 };
 
@@ -326,7 +328,8 @@ export default function JuneFullEvent({ onExit, ruck500Name = "" }) {
     ctx.fillText(fmtDate(participant.finishTime), W / 2 - 150, 402);
     ctx.fillText(fmtElapsed(participant.finishTime - participant.startTime), W / 2 + 150, 402);
 
-    const rowY = 455, thumb = EVENT.checkpoints.length > 4 ? 130 : 190, gap = EVENT.checkpoints.length > 4 ? 14 : 20;
+    const rowY = 455, gap = EVENT.checkpoints.length > 4 ? 12 : 20;
+    const thumb = Math.min(EVENT.checkpoints.length > 4 ? 130 : 190, Math.floor((W - 110 - (EVENT.checkpoints.length - 1) * gap) / EVENT.checkpoints.length));
     const totalW = EVENT.checkpoints.length * thumb + (EVENT.checkpoints.length - 1) * gap;
     let x = W / 2 - totalW / 2;
 
@@ -627,7 +630,7 @@ export default function JuneFullEvent({ onExit, ruck500Name = "" }) {
           >
             I'VE ARRIVED — FINISH RUCK
           </button>
-          {!allDone && <p className="text-center text-xs opacity-50 mt-2">You can finish early, but all six photos are needed for a fully stamped certificate.</p>}
+          {!allDone && <p className="text-center text-xs opacity-50 mt-2">You can finish early, but all checkpoint photos are needed for a fully stamped certificate.</p>}
         </div>
 
         <button onClick={resetEvent} className="w-full mt-4 text-xs underline opacity-45 py-2" style={{ color: CREAM, background: "transparent" }}>

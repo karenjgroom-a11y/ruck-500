@@ -1314,7 +1314,7 @@ export default function RuckChallenge() {
                 {e.eventId === "jun2027" ? (
                   <div className="rounded-lg p-3" style={{background: "#111", border: `1px solid ${CHARCOAL}`}}>
                     <div className="text-center font-extrabold" style={{color:LIME, fontSize:22}}>50 KM · 31.1 MI</div>
-                    <div className="text-center text-xs text-stone-300">RECULVER TOWERS → VIKING BAY → KINGSDOWN</div>
+                    <div className="text-center text-xs text-stone-300">RECULVER TOWERS → KING GEORGE VI MEMORIAL PARK → KINGSDOWN</div>
                     <div className="text-center text-xs text-stone-400 mt-1">Choose full or half challenge</div>
                   </div>
                 ) : e.loop ? (
